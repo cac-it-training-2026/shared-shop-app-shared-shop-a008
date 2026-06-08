@@ -50,5 +50,5 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 * @param id 商品ID
 	 * @return
 	 */
-	List<Item> findAllByOrderById();
+	List<Item> findAllByOrderByIdDesc();
 }
