@@ -83,4 +83,24 @@ public class ClientItemShowController {
 		return "client/item/detail";
 	}
 
+	@RequestMapping(path = "/client/item/list/{sortType}")
+	public String showItemList(Integer sortType, Model model) {
+
+		List<Item> itemList;
+
+		if (sortType == 1) {//新着順
+
+			itemList = itemRepository.findAllByOrderByIdDesc();
+
+		} else {//売れ筋順（未実装）
+
+			itemList = itemRepository.findAllByOrderByIdDesc();
+
+		}
+
+		model.addAttribute("items", itemRepository.findAllByOrderByIdDesc());
+
+		return "client/item/list";
+	}
+
 }
