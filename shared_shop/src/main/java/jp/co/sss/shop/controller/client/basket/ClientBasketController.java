@@ -3,6 +3,7 @@ package jp.co.sss.shop.controller.client.basket;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,7 @@ import jp.co.sss.shop.repository.ItemRepository;
 public class ClientBasketController {
 
 	/** リポジトリのオブジェクトを生成 */
+	@Autowired
 	ItemRepository itemRepository;
 
 	/**
@@ -59,15 +61,33 @@ public class ClientBasketController {
 		// getReferenceById(id)で主キー検索
 		Item item = itemRepository.getReferenceById(id);
 
-		// BasketBeanオブジェクトを生成
-		BasketBean basketBean = new BasketBean();
-		// 商品ID, 商品名, 在庫数をBeanにコピー
-		basketBean.setId(item.getId());
-		basketBean.setName(item.getName());
-		basketBean.setStock(item.getStock());
+		// 同一商品が存在するかのフラグ
+		boolean exist = false;
 
-		// 買い物かごリストに追加
-		basket.add(basketBean);
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean existBasketBeans : basket) {
+			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
+			if (existBasketBeans.getId() == item.getId()) {
+				// 商品注文個数を現在の個数＋1する
+				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
+				// フラグをtrueに設定
+				exist = true;
+				// ループを抜ける
+				break;
+			}
+		}
+
+		// 買い物かごに同一商品が存在しない場合
+		if (!exist) {
+			// BasketBeanオブジェクトを生成
+			BasketBean basketBean = new BasketBean();
+			// 商品ID, 商品名, 在庫数をBeanにコピー
+			basketBean.setId(item.getId());
+			basketBean.setName(item.getName());
+			basketBean.setStock(item.getStock());
+			// 買い物かごリストに追加
+			basket.add(basketBean);
+		}
 
 		// セッションスコープに保存
 		session.setAttribute("basketBeans", basket);
