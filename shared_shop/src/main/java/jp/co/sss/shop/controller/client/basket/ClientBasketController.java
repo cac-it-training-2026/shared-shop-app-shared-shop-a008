@@ -16,6 +16,8 @@ import jp.co.sss.shop.repository.ItemRepository;
 
 /**
  * 買い物かごの基本クラス
+ * 
+ * @author 諸星愛実
  */
 @Controller
 public class ClientBasketController {
@@ -28,7 +30,7 @@ public class ClientBasketController {
 	 * 買い物かご内の商品一覧を表示するメソッド
 	 * 
 	 * @param session
-	 * @return client/basket/list.html
+	 * @return "client/basket/list.html" 買い物かごの内容表示
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
 	public String basketList(HttpSession session, Model model) {
@@ -72,7 +74,7 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @redirect client/basket/list
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
 	public String basketAdd(HttpSession session, Integer id) {
@@ -91,10 +93,17 @@ public class ClientBasketController {
 		// 同一商品が存在するかのフラグ
 		boolean exist = false;
 
+		// 在庫上限フラグ
+		boolean stockOver = false;
+
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
 			if (existBasketBeans.getId() == item.getId()) {
+				if (existBasketBeans.getOrderNum() > item.getStock()) {
+					stockOver = true;
+					break;
+				}
 				// 商品注文個数を現在の個数＋1する
 				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
 				// フラグをtrueに設定
@@ -104,9 +113,7 @@ public class ClientBasketController {
 			}
 		}
 		// 買い物かごに同一商品が存在しない場合
-		if (!exist)
-
-		{
+		if (!exist) {
 			// BasketBeanオブジェクトを生成
 			BasketBean basketBean = new BasketBean();
 			// 商品ID, 商品名, 在庫数をBeanにコピー
@@ -129,7 +136,7 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @redirect client/basket/list
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/delete", method = RequestMethod.POST)
 	public String basketDelete(HttpSession session, Integer id) {
@@ -141,7 +148,7 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @redirect client/basket/list
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/baket/allDelete", method = RequestMethod.POST)
 	public String basketAllDelete(HttpSession session, Integer id) {
