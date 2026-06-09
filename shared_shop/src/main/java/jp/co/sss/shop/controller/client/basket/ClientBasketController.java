@@ -1,10 +1,15 @@
 package jp.co.sss.shop.controller.client.basket;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
+import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.repository.ItemRepository;
 
 /**
@@ -20,13 +25,17 @@ public class ClientBasketController {
 	 * 買い物かご内の商品一覧を表示するメソッド
 	 * 
 	 * @param session
-	 * @return "client/basket/list.html"
+	 * @return client/basket/list.html
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
 	public String basketList(HttpSession session) {
-		session.setAttribute("basketBeans", session.getAttribute("basketBeans"));
 		// templates/client/basket/list.htmlに遷移
 		return "client/basket/list";
+
+		// 買い物かご表示時点で在庫数が買い物かごの数量を下回った場合の処理
+		// コントローラーで在庫数取ってくる
+		// if分岐で在庫不足だった場合、itemNameListLessThanでスコープ保存
+		// 在庫がなかった場合、"itemNameListZero"でスコープ保存
 	}
 
 	/**
@@ -34,13 +43,37 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @return
+	 * @redirect client/basket/list
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
 	public String basketAdd(HttpSession session, Integer id) {
-		// 受け渡されたIDの商品をセッションに追加
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
-		return "redirect:/";
+		// 買い物かごリストが存在しない場合
+		if (basket == null) {
+			// 空の買い物かごリストを生成
+			basket = new ArrayList<BasketBean>();
+		}
+
+		// getReferenceById(id)で主キー検索
+		Item item = itemRepository.getReferenceById(id);
+
+		// BasketBeanオブジェクトを生成
+		BasketBean basketBean = new BasketBean();
+		// 商品ID, 商品名, 在庫数をBeanにコピー
+		basketBean.setId(item.getId());
+		basketBean.setName(item.getName());
+		basketBean.setStock(item.getStock());
+
+		// 買い物かごリストに追加
+		basket.add(basketBean);
+
+		// セッションスコープに保存
+		session.setAttribute("basketBeans", basket);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
 	}
 
 	/**
