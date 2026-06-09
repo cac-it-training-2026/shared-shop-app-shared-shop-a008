@@ -64,7 +64,7 @@ import jp.co.sss.shop.util.Constant;
         // 会員情報をリクエストスコープへ設定
         model.addAttribute("userBean", userBean);
 
-    　 // 会員詳細画面を表示
+        // 会員詳細画面を表示
         return "client/user/detail"; 
     }
 }
