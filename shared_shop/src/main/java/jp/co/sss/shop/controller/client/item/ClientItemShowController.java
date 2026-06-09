@@ -83,24 +83,34 @@ public class ClientItemShowController {
 		return "client/item/detail";
 	}
 
+	/**
+	 * @param sortType　表示順
+	 * @param model　Viewとの値受渡し
+	 * @return "client/item/list" 商品一覧画面表示
+	 */
 	@RequestMapping(path = "/client/item/list/{sortType}")
 	public String showItemList(@PathVariable Integer sortType, Model model) {
 
+		//Item型のリストの宣言
 		List<Item> itemList;
 
-		if (sortType == 1) {//新着順
+		if (sortType == 1) {//新着順の商品情報を取得する
 
 			itemList = itemRepository.findAllByOrderByIdDesc();
 
-		} else {//売れ筋順（未実装）
+		} else {//売れ筋順（未実装）の商品情報を取得する
 
 			itemList = itemRepository.findAllByOrderByIdDesc();
 
 		}
 
+		//ItemListの値をitemBeanListにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
+		//商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
+
+		//表示順をViewへ渡す
 		model.addAttribute("sortType", sortType);
 
 		return "client/item/list";
