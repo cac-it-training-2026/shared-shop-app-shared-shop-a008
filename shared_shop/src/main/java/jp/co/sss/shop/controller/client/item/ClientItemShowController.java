@@ -84,7 +84,7 @@ public class ClientItemShowController {
 	}
 
 	@RequestMapping(path = "/client/item/list/{sortType}")
-	public String showItemList(Integer sortType, Model model) {
+	public String showItemList(@PathVariable Integer sortType, Model model) {
 
 		List<Item> itemList;
 
@@ -98,7 +98,10 @@ public class ClientItemShowController {
 
 		}
 
-		model.addAttribute("items", itemRepository.findAllByOrderByIdDesc());
+		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+
+		model.addAttribute("items", itemBeanList);
+		model.addAttribute("sortType", sortType);
 
 		return "client/item/list";
 	}
