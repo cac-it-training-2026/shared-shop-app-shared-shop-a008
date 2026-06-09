@@ -12,6 +12,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.form.UserForm;
 
+/**
+ * 会員管理 登録機能(一般会員)のコントローラクラス
+ *
+ * @author 難波皐太
+ * 
+ * TIPS: 一般会員向けの会員登録機能処理です。
+ */
 @Controller
 public class ClientUserRegistController {
 
@@ -97,7 +104,15 @@ public class ClientUserRegistController {
 		return "/client/user/regist_input";
 	}
 
-	//確認ボタン 押下時処理
+	/**
+	 * 登録入力確認　処理
+	 *
+	 * @param form 入力フォーム
+	 * @param result 入力値チェックの結果
+	 * @return 
+	 * 	入力値エラーあり："redirect:/admin/user/regist/input" 入力録画面　表示処理
+	 * 	入力値エラーなし："redirect:/admin/user/regist/check" 登録確認画面　表示処理
+	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
 	public String userRegistCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
 		//セッションスコープから入力フォーム情報を取得
@@ -120,6 +135,24 @@ public class ClientUserRegistController {
 		}
 
 		return "/client/user/regist_check";
+	}
+
+	/**
+	 * 登録確認画面　表示処理
+	 *
+	 * @param model Viewとの値受渡し
+	 * @return "admin/user/regist_check" 確認画面　表示
+	 */
+	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.GET)
+	public String userRegistCheckBack(Model model) {
+
+		//セッションから入力フォーム情報取得
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+
+		//入力フォーム情報をスコープへ設定
+		model.addAttribute("userForm", userForm);
+
+		return "/client/user/regist_input";
 	}
 
 }
