@@ -12,18 +12,36 @@ import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
-	//会員詳細表示のコントローラ
+/**
+
+会員詳細表示機能のコントローラクラス
+
+
+@author 富田
+*/
 	@Controller
 	public class ClientUserShowController {
 	
-	//意味：UserRepositoryを自動で用意してください
+	/**
+	会員情報リポジトリ
+	*/
     @Autowired
     UserRepository userRepository;
     
-    //ログインユーザを保持するセッション
+    /**
+    セッション情報
+    */
     @Autowired
     HttpSession session;
+    
+    /**
 
+    会員詳細画面表示処理
+
+
+    @param model Viewとの値受渡し
+    @return "client/user/detail" 会員詳細画面
+    */
     @RequestMapping(path = "/client/user/detail")
     public String showUser(Model model) {
 
@@ -43,8 +61,10 @@ import jp.co.sss.shop.util.Constant;
         UserBean userBean = new UserBean();
         BeanUtils.copyProperties(user, userBean);
 
-        model.addAttribute("userBean", userBean);// 会員情報をリクエストスコープへ設定
+        // 会員情報をリクエストスコープへ設定
+        model.addAttribute("userBean", userBean);
 
-        return "client/user/detail"; // 会員詳細画面を表示
+    　 // 会員詳細画面を表示
+        return "client/user/detail"; 
     }
 }
