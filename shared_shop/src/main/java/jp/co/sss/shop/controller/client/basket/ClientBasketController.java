@@ -42,6 +42,9 @@ public class ClientBasketController {
 		// 在庫が無い場合のリストを生成
 		List<String> itemNameListZero = new ArrayList<>();
 
+		// 在庫切れの際に、買い物かごから削除するためのリストを生成
+		List<BasketBean> removeList = new ArrayList<>();
+
 		// 買い物かごリストがある場合
 		if (basket != null) {
 			// 拡張for文で買い物かごリストの中身をチェック
@@ -53,11 +56,15 @@ public class ClientBasketController {
 				if (item.getStock() == 0) {
 					// 在庫なしリストに追加
 					itemNameListZero.add(basketBean.getName());
+					removeList.add(basketBean);
 				} else if (item.getStock() < basketBean.getOrderNum()) { // 買い物かごの数量が在庫数より多い場合
 					// 在庫不足リストに追加
 					itemNameListLessThan.add(basketBean.getName());
 				}
 			}
+
+			// 在庫切れのものを買い物かごから削除
+			basket.removeAll(removeList);
 		}
 
 		// リクエストスコープに保存
@@ -93,17 +100,10 @@ public class ClientBasketController {
 		// 同一商品が存在するかのフラグ
 		boolean exist = false;
 
-		// 在庫上限フラグ
-		boolean stockOver = false;
-
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
 			if (existBasketBeans.getId() == item.getId()) {
-				if (existBasketBeans.getOrderNum() > item.getStock()) {
-					stockOver = true;
-					break;
-				}
 				// 商品注文個数を現在の個数＋1する
 				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
 				// フラグをtrueに設定
