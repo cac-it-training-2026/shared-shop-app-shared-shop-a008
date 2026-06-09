@@ -94,12 +94,14 @@ public class ClientItemShowController {
 		//Item型のリストの宣言
 		List<Item> itemList;
 
-		if (sortType == 1) {//新着順の商品情報を取得する
+		if (sortType == 1) {
 
+			//新着順の商品情報を取得する
 			itemList = itemRepository.findAllByOrderByIdDesc();
 
-		} else {//売れ筋順（未実装）の商品情報を取得する
+		} else {
 
+			//売れ筋順（未実装）の商品情報を取得する
 			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
 		}

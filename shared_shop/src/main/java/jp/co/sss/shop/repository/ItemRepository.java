@@ -55,6 +55,8 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	/**売れ筋順（注文回数が多い順）
 	 * @param deleteFlag
 	 * @return 商品エンティティのリスト
+	 * 
+	 *左外部結合で注文済み商品だけでなく、全商品を参照
 	 */
 	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = 0 GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findAllByHotSellItems(@Param("deleteFlag") int deleteFlag);
