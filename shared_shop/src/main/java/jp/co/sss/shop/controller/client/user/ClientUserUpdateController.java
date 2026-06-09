@@ -55,7 +55,7 @@ public class ClientUserUpdateController {
 				// 対象が無い場合、エラー
 				return "redirect:/syserror";
 			}
-			// 一般会員変更では、セッションに保存されたIDを使用する
+			//セッションに保存されたIDを使用する
 			Integer id = loginUser.getId();
 
 			//セッションIDを条件に、変更対象のデータをDBから取得
@@ -73,6 +73,7 @@ public class ClientUserUpdateController {
 			session.setAttribute("userForm", userForm);
 
 		}
+		//変更入力画面　表示処理
 		return "redirect:/client/user/update/input";
 	}
 
@@ -100,6 +101,7 @@ public class ClientUserUpdateController {
 			model.addAttribute("org.springframework.validation.BindingResult.userForm", result);
 			session.removeAttribute("result");
 		}
+		//変更入力画面　表示
 		return "client/user/update_input";
 	}
 
@@ -137,6 +139,7 @@ public class ClientUserUpdateController {
 			return "redirect:/client/user/update/input";
 
 		}
+		//変更確認画面　表示処理
 		return "redirect:/client/user/update/check";
 	}
 
