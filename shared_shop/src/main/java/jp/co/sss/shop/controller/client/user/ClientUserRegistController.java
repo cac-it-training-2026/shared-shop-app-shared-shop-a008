@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.shop.form.UserForm;
 
 @Controller
@@ -16,14 +18,24 @@ public class ClientUserRegistController {
 	@Autowired
 	HttpSession session;
 
-	//新規登録リンククリック時処理
+	/**
+	 * 新規登録リンククリック時処理
+	 * 
+	 * @return "redirect:/client/user/regist/input" 
+	 */
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String showResistInput(Model model) {
+		//入力フォーム情報をセッションスコープに保存
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
+		// 入力フォーム情報が存在しない場合
 		if (userForm == null) {
+
+			// 新しい入力フォーム情報を生成
 			userForm = new UserForm();
 			userForm.setAuthority(2);
+
+			// 入力フォーム情報をセッションスコープに保存
 			session.setAttribute("userForm", userForm);
 		}
 
@@ -31,7 +43,11 @@ public class ClientUserRegistController {
 
 	}
 
-	//新規登録ボタン 押下時処理、確認画面-戻るボタン 押下時処理
+	/**
+	 * 新規登録ボタン 押下時処理、確認画面-戻るボタン 押下時処理
+	 * 
+	 * @return "redirect:/client/user/regist/input" 入力画面　表示処理
+	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
 	public String userRegistInputPOST() {
 
@@ -45,21 +61,18 @@ public class ClientUserRegistController {
 
 		}
 
-		//必要な情報を入力フォーム情報にセット
-		userForm.setEmail(userForm.getEmail());
-		userForm.setName(userForm.getName());
-		userForm.setPassword(userForm.getPassword());
-		userForm.setPostalCode(userForm.getPostalCode());
-		userForm.setAddress(userForm.getAddress());
-		userForm.setPhoneNumber(userForm.getPhoneNumber());
-
 		//入力フォーム情報をセッションスコープに保存
 		session.setAttribute("userForm", userForm);
 
 		return "redirect:/client/user/regist/input";
 	}
 
-	//登録画面表示処理
+	/**
+	 * 登録画面表示処理
+	 * 
+	 * @param model Viewとの値受渡し
+	 * @return "admin/user/regist_input" 入力画面　表示
+	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String userRegistInputGET(Model model) {
 
@@ -86,8 +99,27 @@ public class ClientUserRegistController {
 
 	//確認ボタン 押下時処理
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
-	public String userRegistCheck() {
-		return "/regist_check";
+	public String userRegistCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
+		//セッションスコープから入力フォーム情報を取得
+		UserForm SessionForm = (UserForm) session.getAttribute("userForm");
+		session.setAttribute("userForm", form);
+
+		if (SessionForm == null) {
+			// 入力フォーム情報に不足がある場合、セッションスコープから取得した値をセット
+			session.setAttribute("SessionForm", SessionForm);
+
+		}
+
+		//入力エラー情報がある場合
+		if (result.hasErrors()) {
+			//入力エラー情報と入力フォーム情報を設定
+			session.setAttribute("result", result);
+			session.setAttribute("userForm", form);
+
+			return "redirect:/regist/input";
+		}
+
+		return "/client/user/regist_check";
 	}
 
 }
