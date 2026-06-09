@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -30,14 +31,40 @@ public class ClientBasketController {
 	 * @return client/basket/list.html
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
-	public String basketList(HttpSession session) {
+	public String basketList(HttpSession session, Model model) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 在庫不足の場合のリストを生成
+		List<String> itemNameListLessThan = new ArrayList<>();
+		// 在庫が無い場合のリストを生成
+		List<String> itemNameListZero = new ArrayList<>();
+
+		// 買い物かごリストがある場合
+		if (basket != null) {
+			// 拡張for文で買い物かごリストの中身をチェック
+			for (BasketBean basketBean : basket) {
+				// 該当商品のエンティティオブジェクトを生成
+				Item item = itemRepository.getReferenceById(basketBean.getId());
+
+				// 在庫が無い場合
+				if (item.getStock() == 0) {
+					// 在庫なしリストに追加
+					itemNameListZero.add(basketBean.getName());
+				} else if (item.getStock() < basketBean.getOrderNum()) { // 買い物かごの数量が在庫数より多い場合
+					// 在庫不足リストに追加
+					itemNameListLessThan.add(basketBean.getName());
+				}
+			}
+		}
+
+		// リクエストスコープに保存
+		model.addAttribute("itemNameListLessThan", itemNameListLessThan);
+		model.addAttribute("itemNameListZero", itemNameListZero);
+
 		// templates/client/basket/list.htmlに遷移
 		return "client/basket/list";
 
-		// 買い物かご表示時点で在庫数が買い物かごの数量を下回った場合の処理
-		// コントローラーで在庫数取ってくる
-		// if分岐で在庫不足だった場合、itemNameListLessThanでスコープ保存
-		// 在庫がなかった場合、"itemNameListZero"でスコープ保存
 	}
 
 	/**
@@ -76,9 +103,10 @@ public class ClientBasketController {
 				break;
 			}
 		}
-
 		// 買い物かごに同一商品が存在しない場合
-		if (!exist) {
+		if (!exist)
+
+		{
 			// BasketBeanオブジェクトを生成
 			BasketBean basketBean = new BasketBean();
 			// 商品ID, 商品名, 在庫数をBeanにコピー
@@ -101,11 +129,11 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @return
+	 * @redirect client/basket/list
 	 */
 	@RequestMapping(path = "/client/basket/delete", method = RequestMethod.POST)
 	public String basketDelete(HttpSession session, Integer id) {
-		return "redirect:/";
+		return "redirect:/client/basket/list";
 	}
 
 	/**
@@ -113,10 +141,10 @@ public class ClientBasketController {
 	 * 
 	 * @param session
 	 * @param id
-	 * @return
+	 * @redirect client/basket/list
 	 */
 	@RequestMapping(path = "/client/baket/allDelete", method = RequestMethod.POST)
 	public String basketAllDelete(HttpSession session, Integer id) {
-		return "redirect:/";
+		return "redirect:/client/basket/list";
 	}
 }
