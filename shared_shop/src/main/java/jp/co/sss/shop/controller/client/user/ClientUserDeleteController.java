@@ -28,8 +28,8 @@ public class ClientUserDeleteController {
     				return"redirect:/syserror";
     			}
     	//会員情報を画面に渡す
-    	model.addAttribute("userBean",userBean);
+    	model.addAttribute("userForm",userBean);
     	//削除確認画面表示
-    	return"/client/user/delete/check";
+    	return"client/user/delete_check";
     }
 }
