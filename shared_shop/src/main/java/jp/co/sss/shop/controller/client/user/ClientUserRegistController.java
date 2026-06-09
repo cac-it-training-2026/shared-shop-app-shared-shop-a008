@@ -17,9 +17,8 @@ public class ClientUserRegistController {
 	HttpSession session;
 
 	//新規登録リンククリック時処理
-	@RequestMapping(path = "client/user/regist/input/init", method = RequestMethod.GET)
-	public String RegistInputInit() {
-
+	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
+	public String showResistInput(Model model) {
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		if (userForm == null) {
@@ -37,7 +36,7 @@ public class ClientUserRegistController {
 	public String userRegistInputPOST() {
 
 		//セッションスコープより入力情報を取り出す
-		UserForm userForm = (UserForm) session.getAttribute("user");
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		if (userForm == null) {
 
@@ -65,7 +64,7 @@ public class ClientUserRegistController {
 	public String userRegistInputGET(Model model) {
 
 		//セッションスコープから入力フォーム情報を取得
-		UserForm userForm = (UserForm) session.getAttribute("user");
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		//入力エラー確認
 		BindingResult result = (BindingResult) session.getAttribute("result");
@@ -82,7 +81,13 @@ public class ClientUserRegistController {
 		// 入力フォーム情報をリクエストスコープに設定
 		model.addAttribute("userForm", userForm);
 
-		return "/regist_input";
+		return "/client/user/regist_input";
+	}
+
+	//確認ボタン 押下時処理
+	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
+	public String userRegistCheck() {
+		return "/regist_check";
 	}
 
 }
