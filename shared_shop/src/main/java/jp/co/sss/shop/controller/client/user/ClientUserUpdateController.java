@@ -46,26 +46,33 @@ public class ClientUserUpdateController {
 	 */
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.POST)
 	public String updateInputInit() {
+
 		//セッションスコープより入力情報を取り出す
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
+
 			// 変更対象の情報取得
 			UserBean loginUser = (UserBean) session.getAttribute("user");
 			if (loginUser == null) {
+
 				// 対象が無い場合、エラー
 				return "redirect:/syserror";
 			}
+
 			//セッションに保存されたIDを使用する
 			Integer id = loginUser.getId();
 
 			//セッションIDを条件に、変更対象のデータをDBから取得
 			User user = userRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
 			if (user == null) {
+
 				// 対象が無い場合、エラー
 				return "redirect:/syserror";
 			}
+
 			// 初期表示用フォーム情報の生成
 			userForm = new UserForm();
+
 			//変更対象の情報をuserFormにコピー
 			BeanUtils.copyProperties(user, userForm);
 
@@ -73,6 +80,7 @@ public class ClientUserUpdateController {
 			session.setAttribute("userForm", userForm);
 
 		}
+
 		//変更入力画面　表示処理
 		return "redirect:/client/user/update/input";
 	}
@@ -89,18 +97,22 @@ public class ClientUserUpdateController {
 		//セッションから入力フォーム取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
+
 			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
 		}
+
 		// 入力フォーム情報を画面表示設定
 		model.addAttribute("userForm", userForm);
 
 		BindingResult result = (BindingResult) session.getAttribute("result");
 		if (result != null) {
+
 			//セッションにエラー情報がある場合、エラー情報を画面表示設定
 			model.addAttribute("org.springframework.validation.BindingResult.userForm", result);
 			session.removeAttribute("result");
 		}
+
 		//変更入力画面　表示
 		return "client/user/update_input";
 	}
@@ -120,9 +132,11 @@ public class ClientUserUpdateController {
 		//直前のセッション情報を取得
 		UserForm lastUserForm = (UserForm) session.getAttribute("userForm");
 		if (lastUserForm == null) {
+
 			// セッション情報が無い場合、エラー
 			return "redirect:/syserror";
 		}
+
 		// 変更対象IDと権限は、変更前のセッション情報を使用する
 		form.setId(lastUserForm.getId());
 		form.setAuthority(lastUserForm.getAuthority());
@@ -151,12 +165,15 @@ public class ClientUserUpdateController {
 	 */
 	@RequestMapping(path = "/client/user/update/check", method = RequestMethod.GET)
 	public String updateCheck(Model model) {
+
 		//セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
+
 			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
 		}
+
 		//入力フォーム情報をスコープへ設定
 		model.addAttribute("userForm", userForm);
 
@@ -174,6 +191,7 @@ public class ClientUserUpdateController {
 		//セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
+
 			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
 		}
@@ -181,17 +199,22 @@ public class ClientUserUpdateController {
 		//セッションからログイン中のユーザー情報を取得
 		UserBean loginUser = (UserBean) session.getAttribute("user");
 		if (loginUser == null) {
+
 			// 対象が無い場合、エラー
 			return "redirect:/syserror";
 		}
+
 		//一般会員変更に伴い、セッションに保存されたIDを使用する
 		Integer id = loginUser.getId();
+
 		//セッションIDを条件に、変更対象のデータをDBから取得
 		User user = userRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
 		if (user == null) {
+
 			// 対象が無い場合、エラー
 			return "redirect:/syserror";
 		}
+
 		// 画面入力された変更可能項目を設定
 		user.setEmail(userForm.getEmail());
 		user.setPassword(userForm.getPassword());
@@ -199,13 +222,17 @@ public class ClientUserUpdateController {
 		user.setPostalCode(userForm.getPostalCode());
 		user.setAddress(userForm.getAddress());
 		user.setPhoneNumber(userForm.getPhoneNumber());
+
 		//情報の保存
 		userRepository.save(user);
+
 		//ログインユーザー情報を更新
 		loginUser.setName(userForm.getName());
 		session.setAttribute("user", loginUser);
+
 		//セッション情報の削除
 		session.removeAttribute("userForm");
+
 		// 変更完了画面 表示処理
 		return "redirect:/client/user/update/complete";
 	}
@@ -221,4 +248,3 @@ public class ClientUserUpdateController {
 	}
 
 }
-//test
