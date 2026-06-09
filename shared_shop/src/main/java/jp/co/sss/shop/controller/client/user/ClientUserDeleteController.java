@@ -7,9 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
+import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.util.Constant;
 
-@Controller//削除確認コントローラ
-public class ClientUserDeleteController {
+	//削除確認コントローラ
+	@Controller
+	public class ClientUserDeleteController {
 
     /**
      * セッション情報
@@ -20,9 +24,8 @@ public class ClientUserDeleteController {
     @RequestMapping(path = "/client/user/delete/check")
     public String useDeleteCheck(Model model) {
     	
-    	//セッションからログイン中の会員情報を取得
-    	UserBean userBean=(UserBean)session.getAttribute("user");
-    			
+    UserBean userBean = (UserBean) session.getAttribute("user");
+    	
     	//セッション情報がない場合
     	if(userBean==null) {
     				return"redirect:/syserror";
@@ -32,4 +35,41 @@ public class ClientUserDeleteController {
     	//削除確認画面表示
     	return"client/user/delete_check";
     }
+
+	@Autowired
+	UserRepository userRepository;
+	
+	@RequestMapping(path = "/client/user/delete/complete")
+	public String useDeleteComplete() {
+
+
+	    // セッションからログインユーザー取得
+	    UserBean userBean = (UserBean) session.getAttribute("user");
+
+	    if (userBean == null) {
+	        return "redirect:/syserror";
+	    }
+
+	    // DBから会員情報取得
+	    User user = userRepository.findByIdAndDeleteFlag(
+	            userBean.getId(), Constant.NOT_DELETED);
+
+	  
+	    
+	    if (user == null) {
+	        return "redirect:/syserror";
+	    }
+
+	    // 論理削除
+	    user.setDeleteFlag(Constant.DELETED);
+
+	    // 保存
+	    userRepository.save(user);
+
+	    // ログイン情報削除
+	    session.removeAttribute("user");
+
+	    // 完了画面へ
+	    return "client/user/delete_complete";
+	}
 }
