@@ -84,8 +84,8 @@ public class ClientItemShowController {
 	}
 
 	/**
-	 * @param sortType　表示順
-	 * @param model　Viewとの値受渡し
+	 * @param sortType 表示順
+	 * @param model Viewとの値受渡し
 	 * @return "client/item/list" 商品一覧画面表示
 	 */
 	@RequestMapping(path = "/client/item/list/{sortType}")
@@ -100,7 +100,7 @@ public class ClientItemShowController {
 
 		} else {//売れ筋順（未実装）の商品情報を取得する
 
-			itemList = itemRepository.findAllByOrderByIdDesc();
+			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
 		}
 
