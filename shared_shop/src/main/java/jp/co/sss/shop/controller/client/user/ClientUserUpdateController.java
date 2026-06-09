@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.UserForm;
 import jp.co.sss.shop.repository.UserRepository;
+import jp.co.sss.shop.util.Constant;
 
 /**
  * 会員管理 変更機能(一般会員)のコントローラクラス
@@ -48,12 +50,20 @@ public class ClientUserUpdateController {
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
 			// 変更対象の情報取得
-			UserBean user = (UserBean) session.getAttribute("user");
+			UserBean loginUser = (UserBean) session.getAttribute("user");
+			if (loginUser == null) {
+				// 対象が無い場合、エラー
+				return "redirect:/syserror";
+			}
+			// 一般会員変更では、セッションに保存されたIDを使用する
+			Integer id = loginUser.getId();
+
+			//セッションIDを条件に、変更対象のデータをDBから取得
+			User user = userRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
 			if (user == null) {
 				// 対象が無い場合、エラー
 				return "redirect:/syserror";
 			}
-
 			// 初期表示用フォーム情報の生成
 			userForm = new UserForm();
 			//変更対象の情報をuserFormにコピー
@@ -111,10 +121,9 @@ public class ClientUserUpdateController {
 			// セッション情報が無い場合、エラー
 			return "redirect:/syserror";
 		}
-		if (form.getAuthority() == null) {
-			//権限情報がない場合、セッション情報から値をセット
-			form.setAuthority(lastUserForm.getAuthority());
-		}
+		// 変更対象IDと権限は、変更前のセッション情報を使用する
+		form.setId(lastUserForm.getId());
+		form.setAuthority(lastUserForm.getAuthority());
 
 		// 入力フォーム情報をセッションに保持
 		session.setAttribute("userForm", form);
@@ -159,6 +168,42 @@ public class ClientUserUpdateController {
 	 */
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.POST)
 	public String updateComplete() {
+		//セッションから入力フォーム情報取得
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		if (userForm == null) {
+			// セッション情報がない場合、エラー
+			return "redirect:/syserror";
+		}
+
+		//セッションからログイン中のユーザー情報を取得
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		if (loginUser == null) {
+			// 対象が無い場合、エラー
+			return "redirect:/syserror";
+		}
+		//一般会員変更に伴い、セッションに保存されたIDを使用する
+		Integer id = loginUser.getId();
+		//セッションIDを条件に、変更対象のデータをDBから取得
+		User user = userRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
+		if (user == null) {
+			// 対象が無い場合、エラー
+			return "redirect:/syserror";
+		}
+		// 画面入力された変更可能項目を設定
+		user.setEmail(userForm.getEmail());
+		user.setPassword(userForm.getPassword());
+		user.setName(userForm.getName());
+		user.setPostalCode(userForm.getPostalCode());
+		user.setAddress(userForm.getAddress());
+		user.setPhoneNumber(userForm.getPhoneNumber());
+		//情報の保存
+		userRepository.save(user);
+		//ログインユーザー情報を更新
+		loginUser.setName(userForm.getName());
+		session.setAttribute("user", loginUser);
+		//セッション情報の削除
+		session.removeAttribute("userForm");
+		// 変更完了画面 表示処理
 		return "redirect:/client/user/update/complete";
 	}
 
