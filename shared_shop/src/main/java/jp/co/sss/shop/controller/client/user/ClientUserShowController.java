@@ -12,32 +12,33 @@ import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
-@Controller
+@Controller//会員詳細表示のコントローラ
 public class ClientUserShowController {
 
-    @Autowired
+    @Autowired//意味：UserRepositoryを自動で用意してください
     UserRepository userRepository;
 
-    @Autowired
+    @Autowired//ログインユーザを保持するセッション
     HttpSession session;
 
     @RequestMapping(path = "/client/user/detail")
     public String showUser(Model model) {
 
+    	// セッションからログイン中の会員情報を取得
         UserBean loginUser = (UserBean) session.getAttribute("user");
-
+     // 会員IDをもとに未削除の会員情報を取得
         User user = userRepository.findByIdAndDeleteFlag(
                 loginUser.getId(), Constant.NOT_DELETED);
 
-        if (user == null) {
+        if (user == null) {//nullだったら/syserrorに遷移
             return "redirect:/syserror";
         }
 
-        UserBean userBean = new UserBean();
+        UserBean userBean = new UserBean();// Userエンティティの情報をUserBeanにコピー
         BeanUtils.copyProperties(user, userBean);
 
-        model.addAttribute("userBean", userBean);
+        model.addAttribute("userBean", userBean);// 会員情報をリクエストスコープへ設定
 
-        return "client/user/detail";
+        return "client/user/detail"; // 会員詳細画面を表示
     }
 }
