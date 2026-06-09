@@ -9,32 +9,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.form.UserForm;
-import jp.co.sss.shop.repository.UserRepository;
 
 @Controller
 public class ClientUserRegistController {
-	@Autowired
-	UserRepository userrepository;
 
 	@Autowired
 	HttpSession session;
 
 	//新規登録リンク クリック時処理
-	@RequestMapping(path = "/regist/input/init", method = RequestMethod.GET)
+	@RequestMapping(path = "client/user/regist/input/init", method = RequestMethod.GET)
 	public String RegistInputInit() {
 
-		//入力フォーム情報を新規生成
-		UserForm userForm = new UserForm();
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		//入力フォーム情報をセッションスコープに保存
-		session.setAttribute("user", userForm);
+		if (userForm == null) {
+			userForm = new UserForm();
+			userForm.setAuthority(2);
+			session.setAttribute("userForm", userForm);
+		}
 
-		return "redirect:/resist/input";
+		return "redirect:/client/user/regist/input";
+
 	}
 
 	//新規登録ボタン 押下時処理、確認画面-戻るボタン 押下時処理
-	@RequestMapping(path = "/regist/input", method = RequestMethod.POST)
-	public String userRegistInputPOST(HttpSession session) {
+	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
+	public String userRegistInputPOST() {
 
 		//セッションスコープより入力情報を取り出す
 		UserForm userForm = (UserForm) session.getAttribute("user");
@@ -44,28 +44,28 @@ public class ClientUserRegistController {
 			//入力フォーム情報を新規生成
 			userForm = new UserForm();
 
-			//必要な情報を入力フォーム情報にセット
-			userForm.setId(userForm.getId());
-			userForm.setEmail(userForm.getEmail());
-			userForm.setName(userForm.getName());
-			userForm.setPassword(userForm.getPassword());
-			userForm.setPostalCode(userForm.getPostalCode());
-			userForm.setAddress(userForm.getAddress());
-			userForm.setPhoneNumber(userForm.getPhoneNumber());
-
-			//入力フォーム情報をセッションスコープに保存
-			session.setAttribute("userForm", userForm);
-
 		}
-		return "redirect:/regist/input";
+
+		//必要な情報を入力フォーム情報にセット
+		userForm.setEmail(userForm.getEmail());
+		userForm.setName(userForm.getName());
+		userForm.setPassword(userForm.getPassword());
+		userForm.setPostalCode(userForm.getPostalCode());
+		userForm.setAddress(userForm.getAddress());
+		userForm.setPhoneNumber(userForm.getPhoneNumber());
+
+		//入力フォーム情報をセッションスコープに保存
+		session.setAttribute("userForm", userForm);
+
+		return "redirect:/client/user/regist/input";
 	}
 
 	//登録画面表示処理
-	@RequestMapping(path = "/regist/input", method = RequestMethod.GET)
+	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String userRegistInputGET(Model model) {
 
 		//セッションスコープから入力フォーム情報を取得
-		UserForm userForm = (UserForm) session.getAttribute("userForm");
+		UserForm userForm = (UserForm) session.getAttribute("user");
 
 		//入力エラー確認
 		BindingResult result = (BindingResult) session.getAttribute("result");
