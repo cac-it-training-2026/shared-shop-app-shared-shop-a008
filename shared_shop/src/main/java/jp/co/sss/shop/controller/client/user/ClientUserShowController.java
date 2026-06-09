@@ -12,13 +12,16 @@ import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
-@Controller//会員詳細表示のコントローラ
-public class ClientUserShowController {
-
-    @Autowired//意味：UserRepositoryを自動で用意してください
+	//会員詳細表示のコントローラ
+	@Controller
+	public class ClientUserShowController {
+	
+	//意味：UserRepositoryを自動で用意してください
+    @Autowired
     UserRepository userRepository;
-
-    @Autowired//ログインユーザを保持するセッション
+    
+    //ログインユーザを保持するセッション
+    @Autowired
     HttpSession session;
 
     @RequestMapping(path = "/client/user/detail")
@@ -26,15 +29,18 @@ public class ClientUserShowController {
 
     	// セッションからログイン中の会員情報を取得
         UserBean loginUser = (UserBean) session.getAttribute("user");
-     // 会員IDをもとに未削除の会員情報を取得
+     
+        // 会員IDをもとに未削除の会員情報を取得
         User user = userRepository.findByIdAndDeleteFlag(
                 loginUser.getId(), Constant.NOT_DELETED);
 
-        if (user == null) {//nullだったら/syserrorに遷移
+        //nullだったら/syserrorに遷移
+        if (user == null) {
             return "redirect:/syserror";
         }
 
-        UserBean userBean = new UserBean();// Userエンティティの情報をUserBeanにコピー
+        // Userエンティティの情報をUserBeanにコピー
+        UserBean userBean = new UserBean();
         BeanUtils.copyProperties(user, userBean);
 
         model.addAttribute("userBean", userBean);// 会員情報をリクエストスコープへ設定
