@@ -131,10 +131,10 @@ public class ClientUserRegistController {
 			session.setAttribute("result", result);
 			session.setAttribute("userForm", form);
 
-			return "redirect:/regist/input";
+			return "redirect:/client/user/regist/input";
 		}
 
-		return "/client/user/regist_check";
+		return "redirect:/client/user/regist/check";
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class ClientUserRegistController {
 		//入力フォーム情報をスコープへ設定
 		model.addAttribute("userForm", userForm);
 
-		return "/client/user/regist_input";
+		return "/client/user/regist_check";
 	}
 
 }
