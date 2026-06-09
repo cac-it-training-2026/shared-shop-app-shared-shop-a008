@@ -16,7 +16,7 @@ public class ClientUserRegistController {
 	@Autowired
 	HttpSession session;
 
-	//新規登録リンク クリック時処理
+	//新規登録リンククリック時処理
 	@RequestMapping(path = "client/user/regist/input/init", method = RequestMethod.GET)
 	public String RegistInputInit() {
 
