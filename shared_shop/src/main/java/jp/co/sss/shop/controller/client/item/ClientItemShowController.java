@@ -57,7 +57,7 @@ public class ClientItemShowController {
 		// 注文情報の商品情報を全件表示
 		List<Item> itemList = itemRepository.findAll();
 
-		//List<Item> itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+		//List<Item> itemList = itemRepository.findByHotSellItems(Constant.NOT_DELETED);
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);

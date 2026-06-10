@@ -81,6 +81,6 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	@Query("SELECT i FROM Item i JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findByHotSellItems(@Param("deleteFlag") int deleteFlag);
 }
