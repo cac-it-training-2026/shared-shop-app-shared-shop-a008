@@ -111,7 +111,7 @@ public class ClientBasketController {
 				if (existBasketBeans.getOrderNum() >= item.getStock()) {
 					// 在庫数超過のフラグをセッションに保存
 					session.setAttribute("stockLimit" + item.getId(), true);
-				} else {
+				} else { // 買い物かごに追加可能な場合
 					// 商品注文個数を現在の個数＋1する
 					existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
 				}
@@ -150,6 +150,35 @@ public class ClientBasketController {
 	 */
 	@RequestMapping(path = "/client/basket/delete", method = RequestMethod.POST)
 	public String basketDelete(HttpSession session, Integer id) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 削除するためのBeanを定義
+		BasketBean deleteBasketBean = null;
+
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean basketBean : basket) {
+			// 削除対象の商品IDと一致する場合
+			if (basketBean.getId() == id) {
+				// 削除用Beanに代入
+				deleteBasketBean = basketBean;
+				break;
+			}
+		}
+
+		// 買い物かごから該当商品を削除
+		basket.remove(deleteBasketBean);
+
+		// かごの中身が何もない場合
+		if (basket.size() == 0) {
+			// セッションの削除
+			session.removeAttribute("basketBeans");
+		} else { // かごに他の商品がある場合
+			// 該当商品削除後の買い物かごを、セッションに保存
+			session.setAttribute("basketBeans", basket);
+		}
+
+		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
 	}
 
@@ -162,6 +191,10 @@ public class ClientBasketController {
 	 */
 	@RequestMapping(path = "/client/baket/allDelete", method = RequestMethod.POST)
 	public String basketAllDelete(HttpSession session, Integer id) {
+		// 現在の買い物かごリストを取得
+		// セッションの破棄
+
+		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
 	}
 }
