@@ -171,7 +171,7 @@ public class ClientUserRegistController {
 
 	/**
 	 * 情報登録処理
-	 * DBへの入力情報の登録
+	 * DBへの入力情報登録
 	 * 
 	 * @param form 入力フォーム
 	 * @param result 入力値チェックの結果
