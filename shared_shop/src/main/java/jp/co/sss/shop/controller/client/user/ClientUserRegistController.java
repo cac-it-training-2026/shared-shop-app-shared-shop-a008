@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.UserForm;
+import jp.co.sss.shop.repository.UserRepository;
 
 /**
  * 会員管理 登録機能(一般会員)のコントローラクラス
@@ -25,6 +26,9 @@ import jp.co.sss.shop.form.UserForm;
 public class ClientUserRegistController {
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	HttpSession session;
 
 	/**
@@ -34,6 +38,7 @@ public class ClientUserRegistController {
 	 */
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String showResistInput(Model model) {
+
 		//入力フォーム情報をセッションスコープに保存
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
@@ -80,7 +85,7 @@ public class ClientUserRegistController {
 	 * 登録画面表示処理
 	 * 
 	 * @param model Viewとの値受渡し
-	 * @return "admin/user/regist_input" 入力画面　表示
+	 * @return "client/user/regist_input" 入力画面　表示
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String userRegistInputGET(Model model) {
@@ -112,16 +117,18 @@ public class ClientUserRegistController {
 	 * @param form 入力フォーム
 	 * @param result 入力値チェックの結果
 	 * @return 
-	 * 	入力値エラーあり："redirect:/admin/user/regist/input" 入力録画面　表示処理
-	 * 	入力値エラーなし："redirect:/admin/user/regist/check" 登録確認画面　表示処理
+	 * 	入力値エラーあり："redirect:/client/user/regist/input" 入力録画面　表示処理
+	 * 	入力値エラーなし："redirect:/client/user/regist/check" 登録確認画面　表示処理
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
 	public String userRegistCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
+
 		//セッションスコープから入力フォーム情報を取得
 		UserForm SessionForm = (UserForm) session.getAttribute("userForm");
 		session.setAttribute("userForm", form);
 
 		if (SessionForm == null) {
+
 			// 入力フォーム情報に不足がある場合、セッションスコープから取得した値をセット
 			session.setAttribute("SessionForm", SessionForm);
 
@@ -129,6 +136,7 @@ public class ClientUserRegistController {
 
 		//入力エラー情報がある場合
 		if (result.hasErrors()) {
+
 			//入力エラー情報と入力フォーム情報を設定
 			session.setAttribute("result", result);
 			session.setAttribute("userForm", form);
@@ -143,7 +151,7 @@ public class ClientUserRegistController {
 	 * 登録確認画面　表示処理
 	 *
 	 * @param model Viewとの値受渡し
-	 * @return "admin/user/regist_check" 確認画面　表示
+	 * @return "client/user/regist_check" 確認画面　表示
 	 */
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.GET)
 	public String userRegistCheckBack(Model model) {
@@ -160,23 +168,36 @@ public class ClientUserRegistController {
 	/**
 	 * 情報登録処理
 	 *
-	 * @return "redirect:/admin/user/regist/complete" 登録完了画面　表示処理
+	 * @return "redirect:/client/user/regist/complete" 登録完了画面　表示処理
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
 	public String userRegistComplete(@Valid @ModelAttribute UserForm form, BindingResult result) {
+
 		//セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		if (userForm == null) {
+
 			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
 		}
 
+		//DB登録用エンティティオブジェクトを生成
 		User user = new User();
 
+		//DB登録実施
 		BeanUtils.copyProperties(userForm, user, "id");
+		user = userRepository.save(user);
 
+		//セッションスコープの入力フォーム情報削除
 		session.removeAttribute("userForm");
+
+		//未ログインでの会員登録の場合、ログイン状態にする
+		if (session.getAttribute("user") == null) {
+
+			session.setAttribute("user", user);
+
+		}
 
 		return "redirect:/client/user/regist/complete";
 	}
@@ -184,7 +205,7 @@ public class ClientUserRegistController {
 	/**
 	 * 登録完了画面　表示処理
 	 *
-	 * @return "admin/user/regist_complete" 登録完了画面　表示
+	 * @return "client/user/regist_complete" 登録完了画面　表示
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.GET)
 	public String userRegistCompleteFinish() {
