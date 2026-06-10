@@ -189,11 +189,10 @@ public class ClientBasketController {
 	 * @param id
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
-	@RequestMapping(path = "/client/baket/allDelete", method = RequestMethod.POST)
+	@RequestMapping(path = "/client/basket/allDelete", method = RequestMethod.POST)
 	public String basketAllDelete(HttpSession session) {
 		// セッションの破棄
 		session.removeAttribute("basketBeans");
-
 		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
 	}
