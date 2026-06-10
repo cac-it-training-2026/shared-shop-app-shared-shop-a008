@@ -40,7 +40,7 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
 	public String showResistInput(Model model) {
 
-		//入力フォーム情報をセッションスコープに保存
+		// 入力フォーム情報をセッションスコープに保存
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		// 入力フォーム情報が存在しない場合
@@ -66,18 +66,18 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
 	public String userRegistInputPOST() {
 
-		//セッションスコープより入力情報を取り出す
+		// セッションスコープより入力情報を取り出す
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		// 入力フォーム情報が存在しない場合
 		if (userForm == null) {
 
-			//入力フォーム情報を新規生成
+			// 入力フォーム情報を新規生成
 			userForm = new UserForm();
 
 		}
 
-		//入力フォーム情報をセッションスコープに保存
+		// 入力フォーム情報をセッションスコープに保存
 		session.setAttribute("userForm", userForm);
 
 		return "redirect:/client/user/regist/input";
@@ -92,19 +92,19 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.GET)
 	public String userRegistInputGET(Model model) {
 
-		//セッションスコープから入力フォーム情報を取得
+		// セッションスコープから入力フォーム情報を取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		//入力エラー確認
+		// 入力エラー確認
 		BindingResult result = (BindingResult) session.getAttribute("result");
 
-		//セッションにエラー情報がある場合、
+		// セッションにエラー情報がある場合、
 		if (result != null) {
 
-			//エラー情報をリクエストスコープに設定
+			// エラー情報をリクエストスコープに設定
 			model.addAttribute("org.springframework.validation.BindingResult.userForm", result);
 
-			//セッションからエラー情報を削除
+			// セッションからエラー情報を削除
 			session.removeAttribute("result");
 		}
 
@@ -126,22 +126,22 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.POST)
 	public String userRegistCheck(@Valid @ModelAttribute UserForm form, BindingResult result) {
 
-		//セッションスコープから入力フォーム情報を取得
+		// セッションスコープから入力フォーム情報を取得
 		UserForm SessionForm = (UserForm) session.getAttribute("userForm");
 		session.setAttribute("userForm", form);
 
-		//入力フォーム情報に不足がある場合、
+		// 入力フォーム情報に不足がある場合、
 		if (SessionForm == null) {
 
-			//セッションスコープから取得した値をセット
+			// セッションスコープから取得した値をセット
 			session.setAttribute("SessionForm", SessionForm);
 
 		}
 
-		//入力エラー情報がある場合
+		// 入力エラー情報がある場合
 		if (result.hasErrors()) {
 
-			//入力エラー情報と入力フォーム情報を設定
+			// 入力エラー情報と入力フォーム情報を設定
 			session.setAttribute("result", result);
 			session.setAttribute("userForm", form);
 
@@ -160,10 +160,10 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/check", method = RequestMethod.GET)
 	public String userRegistCheckBack(Model model) {
 
-		//セッションから入力フォーム情報取得
+		// セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
-		//入力フォーム情報をスコープへ設定
+		// 入力フォーム情報をスコープへ設定
 		model.addAttribute("userForm", userForm);
 
 		return "/client/user/regist_check";
@@ -180,7 +180,7 @@ public class ClientUserRegistController {
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
 	public String userRegistComplete(@Valid @ModelAttribute UserForm form, BindingResult result) {
 
-		//セッションから入力フォーム情報取得
+		// セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
 		// 入力フォーム情報が存在しない場合
@@ -190,17 +190,17 @@ public class ClientUserRegistController {
 
 		}
 
-		//DB登録用エンティティオブジェクト生成
+		// DB登録用エンティティオブジェクト生成
 		User user = new User();
 
-		//DB登録実施
+		// DB登録実施
 		BeanUtils.copyProperties(userForm, user, "id");
 		user = userRepository.save(user);
 
-		//セッションスコープの入力フォーム情報削除
+		// セッションスコープの入力フォーム情報削除
 		session.removeAttribute("userForm");
 
-		//未ログインでの会員登録の場合、ログイン状態にする
+		// 未ログインでの会員登録の場合、ログイン状態にする
 		if (session.getAttribute("user") == null) {
 
 			session.setAttribute("user", user);
