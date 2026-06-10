@@ -11,7 +11,16 @@ import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
 
-	//削除確認コントローラ
+
+/**
+ * 
+
+削除確認コントローラクラス
+
+
+@author 富田
+*/
+
 	@Controller
 	public class ClientUserDeleteController {
 
@@ -23,21 +32,34 @@ import jp.co.sss.shop.util.Constant;
 
     @RequestMapping(path = "/client/user/delete/check")
     public String useDeleteCheck(Model model) {
-    	
-    UserBean userBean = (UserBean) session.getAttribute("user");
+    
+    	// セッションからログインユーザー取得
+    	UserBean userBean = (UserBean) session.getAttribute("user");
     	
     	//セッション情報がない場合
     	if(userBean==null) {
-    				return"redirect:/syserror";
-    			}
+    		return"redirect:/syserror";
+    	}
+    	
     	//会員情報を画面に渡す
     	model.addAttribute("userForm",userBean);
+    	
     	//削除確認画面表示
     	return"client/user/delete_check";
     }
-
+    
+    /**
+     * 会員情報リポジトリ
+     */
 	@Autowired
 	UserRepository userRepository;
+	
+	/**
+	退会確認画面表示処理
+
+	@param model Viewとの値受渡し
+	@return "client/user/delete_check" 退会確認画面
+	*/
 	
 	@RequestMapping(path = "/client/user/delete/complete")
 	public String useDeleteComplete() {
