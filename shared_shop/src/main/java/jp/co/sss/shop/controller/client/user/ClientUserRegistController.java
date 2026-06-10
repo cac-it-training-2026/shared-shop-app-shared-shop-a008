@@ -1,5 +1,6 @@
 package jp.co.sss.shop.controller.client.user;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.UserForm;
 
 /**
@@ -154,5 +156,35 @@ public class ClientUserRegistController {
 
 		return "/client/user/regist_check";
 	}
+
+	/**
+	 * 情報登録処理
+	 *
+	 * @return "redirect:/admin/user/regist/complete" 登録完了画面　表示処理
+	 */
+	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
+	public String userRegistComplete(@Valid @ModelAttribute UserForm form, BindingResult result) {
+		//セッションから入力フォーム情報取得
+		UserForm userForm = (UserForm) session.getAttribute("userForm");
+
+		if (userForm == null) {
+			// セッション情報がない場合、エラー
+			return "redirect:/syserror";
+		}
+
+		User user = new User();
+
+		BeanUtils.copyProperties(userForm, user, "id");
+
+		session.removeAttribute("userForm");
+
+		return "redirect:/client/user/regist/complete";
+	}
+
+	/**
+	 * 登録完了画面　表示処理
+	 *
+	 * @return "admin/user/regist_complete" 登録完了画面　表示
+	 */
 
 }
