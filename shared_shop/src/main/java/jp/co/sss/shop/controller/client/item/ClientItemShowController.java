@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
@@ -89,20 +90,46 @@ public class ClientItemShowController {
 	 * @return "client/item/list" 商品一覧画面表示
 	 */
 	@RequestMapping(path = "/client/item/list/{sortType}")
-	public String showItemList(@PathVariable Integer sortType, Model model) {
+	public String showItemList(@PathVariable Integer sortType, @RequestParam(required = false) Integer categoryId,
+			Model model) {
 
 		//Item型のリストの宣言
 		List<Item> itemList;
 
-		if (sortType == 1) {
+		//		if (sortType == 1) {
+		//
+		//			//新着順の商品情報を取得する
+		//			itemList = itemRepository.findAllByOrderByIdDesc();
+		//
+		//		} else {
+		//
+		//			//売れ筋順（未実装）の商品情報を取得する
+		//			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+		//
+		//		}
 
-			//新着順の商品情報を取得する
-			itemList = itemRepository.findAllByOrderByIdDesc();
+		if (categoryId == null) {
 
+			if (sortType == 1) {
+
+				itemList = itemRepository.findAllByOrderByIdDesc();
+
+			} else {
+
+				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+
+			}
 		} else {
 
-			//売れ筋順（未実装）の商品情報を取得する
-			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+			if (sortType == 1) {
+
+				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
+
+			} else {
+
+				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
+
+			}
 
 		}
 
