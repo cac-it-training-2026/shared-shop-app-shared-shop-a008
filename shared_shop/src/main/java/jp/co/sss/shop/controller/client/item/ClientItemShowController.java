@@ -63,7 +63,7 @@ public class ClientItemShowController {
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
 
-		//カテゴリ情報をViewへ渡す
+		//カテゴリ情報をViewへ渡す（追加）
 		model.addAttribute("categories",
 				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
@@ -92,6 +92,10 @@ public class ClientItemShowController {
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
 
+		//カテゴリ情報をViewへ渡す（追加）
+		model.addAttribute("categories",
+				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
+
 		return "client/item/detail";
 	}
 
@@ -106,18 +110,6 @@ public class ClientItemShowController {
 
 		//Item型のリストの宣言
 		List<Item> itemList;
-
-		//		if (sortType == 1) {
-		//
-		//			//新着順の商品情報を取得する
-		//			itemList = itemRepository.findAllByOrderByIdDesc();
-		//
-		//		} else {
-		//
-		//			//売れ筋順（未実装）の商品情報を取得する
-		//			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
-		//
-		//		}
 
 		//カテゴリ検索されていないとき
 		if (categoryId == null) {
