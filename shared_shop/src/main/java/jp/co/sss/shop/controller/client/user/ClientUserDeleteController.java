@@ -52,13 +52,15 @@ import jp.co.sss.shop.util.Constant;
     	}
     	
     	User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(),Constant.NOT_DELETED);
-    	UserBean userBean = new UserBean ();
-    	BeanUtils.copyProperties(user, userBean);
-    	
+   
     	// 対象が存在しない場合
         if (user == null) {
             return "redirect:/syserror";
         }
+        
+        UserBean userBean = new UserBean ();
+    	BeanUtils.copyProperties(user, userBean);
+    	
     	//会員情報を画面に渡す
     	model.addAttribute("userForm",userBean);
     	
