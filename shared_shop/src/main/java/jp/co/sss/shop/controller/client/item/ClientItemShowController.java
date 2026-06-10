@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
@@ -28,6 +29,12 @@ public class ClientItemShowController {
 	 */
 	@Autowired
 	ItemRepository itemRepository;
+
+	/**
+	 * カテゴリ情報
+	 */
+	@Autowired
+	CategoryRepository categoryRepository;
 
 	/**
 	 * Entity、Form、Bean間のデータコピーサービス
@@ -55,6 +62,10 @@ public class ClientItemShowController {
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
+
+		//カテゴリ情報をViewへ渡す
+		model.addAttribute("categories",
+				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
 		return "index";
 	}
@@ -119,6 +130,7 @@ public class ClientItemShowController {
 				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
 			}
+
 		} else {
 
 			if (sortType == 1) {
@@ -141,6 +153,11 @@ public class ClientItemShowController {
 
 		//表示順をViewへ渡す
 		model.addAttribute("sortType", sortType);
+
+		model.addAttribute("categoryId", categoryId);
+
+		model.addAttribute("categories",
+				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
 		return "client/item/list";
 	}
