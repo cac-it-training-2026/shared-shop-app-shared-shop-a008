@@ -1,5 +1,6 @@
 package jp.co.sss.shop.controller.client.user;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,13 +35,21 @@ import jp.co.sss.shop.util.Constant;
     public String useDeleteCheck(Model model) {
     
     	// セッションからログインユーザー取得
-    	UserBean userBean = (UserBean) session.getAttribute("user");
+    	UserBean loginUser = (UserBean) session.getAttribute("user");
     	
     	//セッション情報がない場合
-    	if(userBean==null) {
+    	if(loginUser == null) {
     		return"redirect:/syserror";
     	}
     	
+    	User user = userRepository.findByIdAndDeleteFlag(loginUser.getId(),Constant.NOT_DELETED);
+    	UserBean userBean = new UserBean ();
+    	BeanUtils.copyProperties(user, userBean);
+    	
+    	// 対象が存在しない場合
+        if (user == null) {
+            return "redirect:/syserror";
+        }
     	//会員情報を画面に渡す
     	model.addAttribute("userForm",userBean);
     	
