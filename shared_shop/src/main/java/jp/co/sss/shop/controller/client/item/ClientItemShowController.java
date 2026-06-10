@@ -57,6 +57,8 @@ public class ClientItemShowController {
 		// 注文情報の商品情報を全件表示
 		List<Item> itemList = itemRepository.findAll();
 
+		//List<Item> itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
@@ -112,7 +114,7 @@ public class ClientItemShowController {
 		List<Item> itemList;
 
 		// カテゴリ検索されていないとき
-		if (categoryId == null) {
+		if (categoryId == null || categoryId == 0) {
 
 			// 新着順
 			if (sortType == 1) {
