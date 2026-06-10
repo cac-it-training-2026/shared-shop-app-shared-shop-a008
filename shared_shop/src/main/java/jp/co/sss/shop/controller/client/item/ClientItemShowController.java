@@ -119,26 +119,36 @@ public class ClientItemShowController {
 		//
 		//		}
 
+		//カテゴリ検索されていないとき
 		if (categoryId == null) {
 
+			//新着順
 			if (sortType == 1) {
 
+				//新着順の商品情報を取得する
 				itemList = itemRepository.findAllByOrderByIdDesc();
 
+				//売れ筋順
 			} else {
 
+				//売れ筋順の商品情報を取得する
 				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
 			}
 
+			//カテゴリ検索されているとき
 		} else {
 
+			//新着順
 			if (sortType == 1) {
 
+				//検索されたカテゴリかつ新着順の商品情報を取得する
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
 
+				//売れ筋順
 			} else {
 
+				//検索されたカテゴリかつ売れ筋順の商品情報を取得する
 				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
 
 			}
@@ -154,8 +164,10 @@ public class ClientItemShowController {
 		//表示順をViewへ渡す
 		model.addAttribute("sortType", sortType);
 
+		//カテゴリIDをViewへ渡す
 		model.addAttribute("categoryId", categoryId);
 
+		//カテゴリ情報をViewへ渡す
 		model.addAttribute("categories",
 				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
