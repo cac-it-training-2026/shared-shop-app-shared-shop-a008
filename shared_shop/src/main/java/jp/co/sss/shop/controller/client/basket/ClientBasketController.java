@@ -153,21 +153,21 @@ public class ClientBasketController {
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
-		// 削除するためのBeanを定義
-		BasketBean deleteBasketBean = null;
-
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean basketBean : basket) {
 			// 削除対象の商品IDと一致する場合
 			if (basketBean.getId() == id) {
-				// 削除用Beanに代入
-				deleteBasketBean = basketBean;
-				break;
+				// 注文数が1の場合
+				if (basketBean.getOrderNum() == 1) {
+					basket.remove(basketBean);
+					break;
+				} else { // 注文数が2個以上ある場合
+					// 要素の注文数を現在の注文数-1する
+					basketBean.setOrderNum(basketBean.getOrderNum() - 1);
+					break;
+				}
 			}
 		}
-
-		// 買い物かごから該当商品を削除
-		basket.remove(deleteBasketBean);
 
 		// かごの中身が何もない場合
 		if (basket.size() == 0) {
@@ -190,9 +190,9 @@ public class ClientBasketController {
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/baket/allDelete", method = RequestMethod.POST)
-	public String basketAllDelete(HttpSession session, Integer id) {
-		// 現在の買い物かごリストを取得
+	public String basketAllDelete(HttpSession session) {
 		// セッションの破棄
+		session.removeAttribute("basketBeans");
 
 		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
