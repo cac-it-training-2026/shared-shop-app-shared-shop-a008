@@ -63,7 +63,7 @@ public class ClientItemShowController {
 		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
 
-		//カテゴリ情報をViewへ渡す（追加）
+		// カテゴリ情報をViewへ渡す（追加）
 		model.addAttribute("categories",
 				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
@@ -92,7 +92,7 @@ public class ClientItemShowController {
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
 
-		//カテゴリ情報をViewへ渡す（追加）
+		// カテゴリ情報をViewへ渡す（追加）
 		model.addAttribute("categories",
 				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
@@ -108,58 +108,58 @@ public class ClientItemShowController {
 	public String showItemList(@PathVariable Integer sortType, @RequestParam(required = false) Integer categoryId,
 			Model model) {
 
-		//Item型のリストの宣言
+		// Item型のリストの宣言
 		List<Item> itemList;
 
-		//カテゴリ検索されていないとき
+		// カテゴリ検索されていないとき
 		if (categoryId == null) {
 
-			//新着順
+			// 新着順
 			if (sortType == 1) {
 
-				//新着順の商品情報を取得する
+				// 新着順の商品情報を取得する
 				itemList = itemRepository.findAllByOrderByIdDesc();
 
-				//売れ筋順
+				// 売れ筋順
 			} else {
 
-				//売れ筋順の商品情報を取得する
+				// 売れ筋順の商品情報を取得する
 				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
 			}
 
-			//カテゴリ検索されているとき
+			// カテゴリ検索されているとき
 		} else {
 
-			//新着順
+			// 新着順
 			if (sortType == 1) {
 
-				//検索されたカテゴリかつ新着順の商品情報を取得する
+				// 検索されたカテゴリかつ新着順の商品情報を取得する
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
 
-				//売れ筋順
+				// 売れ筋順
 			} else {
 
-				//検索されたカテゴリかつ売れ筋順の商品情報を取得する
+				// 検索されたカテゴリかつ売れ筋順の商品情報を取得する
 				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
 
 			}
 
 		}
 
-		//ItemListの値をitemBeanListにコピー
+		// ItemListの値をitemBeanListにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
 
-		//商品情報をViewへ渡す
+		// 商品情報をViewへ渡す
 		model.addAttribute("items", itemBeanList);
 
-		//表示順をViewへ渡す
+		// 表示順をViewへ渡す
 		model.addAttribute("sortType", sortType);
 
-		//カテゴリIDをViewへ渡す
+		// カテゴリIDをViewへ渡す
 		model.addAttribute("categoryId", categoryId);
 
-		//カテゴリ情報をViewへ渡す
+		// カテゴリ情報をViewへ渡す
 		model.addAttribute("categories",
 				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
