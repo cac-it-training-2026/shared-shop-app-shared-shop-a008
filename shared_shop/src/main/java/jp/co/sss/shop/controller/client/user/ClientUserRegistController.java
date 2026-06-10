@@ -186,5 +186,10 @@ public class ClientUserRegistController {
 	 *
 	 * @return "admin/user/regist_complete" 登録完了画面　表示
 	 */
+	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.GET)
+	public String userRegistCompleteFinish() {
+
+		return "/client/user/regist_complete";
+	}
 
 }
