@@ -33,7 +33,8 @@ public class ClientUserRegistController {
 
 	/**
 	 * 新規登録リンククリック時処理
-	 * 
+	 *
+	 * @param model Viewとの値受渡し
 	 * @return "redirect:/client/user/regist/input" 
 	 */
 	@RequestMapping(path = "/client/user/regist/input/init", method = RequestMethod.GET)
@@ -58,9 +59,9 @@ public class ClientUserRegistController {
 	}
 
 	/**
-	 * 新規登録ボタン 押下時処理、確認画面-戻るボタン 押下時処理
-	 * 
-	 * @return "redirect:/client/user/regist/input" 入力画面　表示処理
+	 * 新規登録ボタン押下時処理、確認画面-戻るボタン押下時処理
+	 *
+	 * @return "redirect:/client/user/regist/input" 
 	 */
 	@RequestMapping(path = "/client/user/regist/input", method = RequestMethod.POST)
 	public String userRegistInputPOST() {
@@ -68,6 +69,7 @@ public class ClientUserRegistController {
 		//セッションスコープより入力情報を取り出す
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
+		// 入力フォーム情報が存在しない場合
 		if (userForm == null) {
 
 			//入力フォーム情報を新規生成
@@ -96,9 +98,10 @@ public class ClientUserRegistController {
 		//入力エラー確認
 		BindingResult result = (BindingResult) session.getAttribute("result");
 
+		//セッションにエラー情報がある場合、
 		if (result != null) {
 
-			//セッションにエラー情報がある場合、エラー情報をリクエストスコープに設定
+			//エラー情報をリクエストスコープに設定
 			model.addAttribute("org.springframework.validation.BindingResult.userForm", result);
 
 			//セッションからエラー情報を削除
@@ -127,9 +130,10 @@ public class ClientUserRegistController {
 		UserForm SessionForm = (UserForm) session.getAttribute("userForm");
 		session.setAttribute("userForm", form);
 
+		//入力フォーム情報に不足がある場合、
 		if (SessionForm == null) {
 
-			// 入力フォーム情報に不足がある場合、セッションスコープから取得した値をセット
+			//セッションスコープから取得した値をセット
 			session.setAttribute("SessionForm", SessionForm);
 
 		}
@@ -167,8 +171,11 @@ public class ClientUserRegistController {
 
 	/**
 	 * 情報登録処理
-	 *
-	 * @return "redirect:/client/user/regist/complete" 登録完了画面　表示処理
+	 * DBへの入力情報の登録
+	 * 
+	 * @param form 入力フォーム
+	 * @param result 入力値チェックの結果
+	 * @return "redirect:/client/user/regist/complete" 登録完了画面表示処理
 	 */
 	@RequestMapping(path = "/client/user/regist/complete", method = RequestMethod.POST)
 	public String userRegistComplete(@Valid @ModelAttribute UserForm form, BindingResult result) {
@@ -176,10 +183,11 @@ public class ClientUserRegistController {
 		//セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
+		// 入力フォーム情報が存在しない場合
 		if (userForm == null) {
 
-			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
+
 		}
 
 		//DB登録用エンティティオブジェクト生成
