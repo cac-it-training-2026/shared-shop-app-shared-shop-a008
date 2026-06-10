@@ -30,6 +30,15 @@ import jp.co.sss.shop.util.Constant;
      */
     @Autowired
     HttpSession session;
+    
+    /**
+     * 会員情報リポジトリ
+     */
+	@Autowired
+	UserRepository userRepository;
+	
+	
+
 
     @RequestMapping(path = "/client/user/delete/check")
     public String useDeleteCheck(Model model) {
@@ -57,14 +66,8 @@ import jp.co.sss.shop.util.Constant;
     	return"client/user/delete_check";
     }
     
-    /**
-     * 会員情報リポジトリ
-     */
-	@Autowired
-	UserRepository userRepository;
-	
-	/**
-	退会確認画面表示処理
+
+	/**退会確認画面表示処理
 
 	@param model Viewとの値受渡し
 	@return "client/user/delete_check" 退会確認画面
@@ -96,6 +99,9 @@ import jp.co.sss.shop.util.Constant;
 
 	    // 保存
 	    userRepository.save(user);
+	    
+	    // 買い物かご情報を削除
+	    session.removeAttribute("basketBeans");
 
 	    // ログイン情報削除
 	    session.removeAttribute("user");
