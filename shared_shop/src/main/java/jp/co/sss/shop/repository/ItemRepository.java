@@ -52,11 +52,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 */
 	List<Item> findAllByOrderByIdDesc();
 
-	/**売れ筋順（注文回数が多い順）
+	/**売れ筋順（注文回数が多い順）、左外部結合で注文情報がある商品だけでなく、全商品を参照
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
-	 * 
-	 *左外部結合で注文済み商品だけでなく、全商品を参照
 	 */
 	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findAllByHotSellItems(@Param("deleteFlag") int deleteFlag);
@@ -77,4 +75,12 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 */
 	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findHotSellItemsByCategory(@Param("categoryId") Integer categoryId, @Param("deleteFlag") int deleteFlag);
+
+	/**
+	 * 売れ筋順（注文回数が多い順）、内部結合で注文情報がある商品のみ参照
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findByHotSellItems(@Param("deleteFlag") int deleteFlag);
 }
