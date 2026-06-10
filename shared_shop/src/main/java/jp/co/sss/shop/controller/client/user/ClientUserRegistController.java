@@ -182,7 +182,7 @@ public class ClientUserRegistController {
 			return "redirect:/syserror";
 		}
 
-		//DB登録用エンティティオブジェクトを生成
+		//DB登録用エンティティオブジェクト生成
 		User user = new User();
 
 		//DB登録実施
