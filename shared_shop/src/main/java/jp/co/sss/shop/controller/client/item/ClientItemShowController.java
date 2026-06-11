@@ -51,13 +51,25 @@ public class ClientItemShowController {
 	@RequestMapping(path = "/", method = { RequestMethod.GET, RequestMethod.POST })
 	public String index(Model model) {
 
+		//DONE
 		/*TODO 現在は全件表示を行っている
 		 * これを売れ筋（注文回数が多い順）に改修する*/
 
 		// 注文情報の商品情報を全件表示
-		List<Item> itemList = itemRepository.findAll();
+		//		List<Item> itemList = itemRepository.findAll();
 
-		//List<Item> itemList = itemRepository.findByHotSellItems(Constant.NOT_DELETED);
+		// 注文がある商品情報のみを売れ筋で表示
+		List<Item> itemList = itemRepository.findByHotSellItems(Constant.NOT_DELETED);
+
+		// 注文がある商品情報がない場合
+		if (itemList.isEmpty()) {
+
+			// 表示順をViewに渡す（1：新着順）
+			model.addAttribute("sortType", 1);
+
+			// 新着順の商品情報を取得する
+			itemList = itemRepository.findAllByOrderByIdDesc();
+		}
 
 		// エンティティ内の検索結果をJavaBeansにコピー
 		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
