@@ -1,5 +1,8 @@
 package jp.co.sss.shop.controller.client.order;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,9 +13,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.OrderForm;
+import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
 import jp.co.sss.shop.repository.UserRepository;
 
@@ -31,6 +38,10 @@ public class ClientOrderRegistController {
 	/** Userリポジトリのオブジェクトを生成 */
 	@Autowired
 	UserRepository userRepository;
+
+	/** Itemリポジトリのオブジェクトを生成 */
+	@Autowired
+	ItemRepository itemRepository;
 
 	/**
 	 * @param session
@@ -90,7 +101,7 @@ public class ClientOrderRegistController {
 			session.removeAttribute("errors");
 		}
 
-		// 登録画面表示
+		// 届け先入力画面表示
 		return "/client/order/address_input";
 	}
 
@@ -98,7 +109,7 @@ public class ClientOrderRegistController {
 	 * @param orderForm
 	 * @param result
 	 * @param session
-	 * @redirect "client/order/payment/input"
+	 * @redirect "client/order/payment/input" 支払方法選択画面
 	 */
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
 	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result,
@@ -121,19 +132,21 @@ public class ClientOrderRegistController {
 	/**
 	 * @param session
 	 * @param model
-	 * @return
+	 * @return "client/order/payment_input.html" 支払方法選択画面
 	 */
 	@RequestMapping("/client/order/payment/input")
 	public String paymentInputGet(HttpSession session, Model model) {
-		//		・セッションスコープから注文入力フォーム情報を取得
+		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
-		//		・注文フォーム情報をリクエストスコープに設定
+		// 注文フォーム情報をリクエストスコープに設定
 		model.addAttribute("payMethod", orderForm.getPayMethod());
-		//		・支払方法選択画面表示
+		// 支払方法選択画面表示
 		return "/client/order/payment_input";
 	}
 
 	/**
+	 * 戻るボタンを押下された時に、支払方法選択画面を表示するメソッド
+	 * 
 	 * @redirect "client/order/address/input" 支払方法選択画面
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
@@ -145,68 +158,125 @@ public class ClientOrderRegistController {
 	/**
 	 * @param session
 	 * @param model
-	 * @redirect
+	 * @redirect "client/order/check" 注文確認画面
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
-	public String orderCheckPost(HttpSession session, Model model) {
-		//		・セッションスコープから注文入力フォーム情報を取得
-		//		・画面から入力された支払方法を取得した注文入力フォーム情報に設定
-		//		・注文入力フォーム情報をセッションスコープに保存
-		//		・注文確認画面表示処理へリダイレクト
+	public String orderCheckPost(HttpSession session, Model model, Integer payMethod) {
+		// セッションスコープから注文入力フォーム情報を取得
+		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// 画面から入力された支払方法を取得した注文入力フォーム情報に設定
+		orderForm.setPayMethod(payMethod);
+		// 注文入力フォーム情報をセッションスコープに保存
+		session.setAttribute("orderForm", orderForm);
+		// 注文確認画面表示処理へリダイレクト
 		return "redirect:/client/order/check";
 	}
 
 	/**
 	 * @param session
 	 * @param model
-	 * @return
+	 * @return "client/order/check.html" 注文確認画面
 	 */
 	@RequestMapping("/client/order/check")
 	public String orderCheckGet(HttpSession session, Model model) {
-		//		・セッションスコープから注文情報を取得
-		//		・セッションスコープから買い物かご情報を取得
-		//		・注文商品の最新情報をDBから取得し、商品の在庫チェックを行う
-		//		・在庫不足、在庫切れ商品がある場合
-		//		- 注文警告メッセージをリクエストスコープに保存
-		//		- 在庫数にあわせて、買い物かご情報を更新（注文数、在庫数）
-		//		- 在庫切れの商品は、買い物かごから削除
-		//		・在庫状況を反映した買い物かご情報をセッションに保存
-		//		・買い物かご情報から、商品ごとの金額小計を算出し、注文商品情報リストに保存
+		// セッションスコープから注文情報を取得
+		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+
+		// セッションスコープから買い物かご情報を取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		// 注文商品情報リストを生成
+		List<OrderItemBean> orderItemList = new ArrayList<>();
+		// 在庫不足の場合のリストを生成
+		List<String> itemNameListThan = new ArrayList<>();
+		// 在庫が無い場合のリストを生成
+		List<String> itemNameListZero = new ArrayList<>();
+		// 商品削除用のリストを生成
+		List<BasketBean> removeList = new ArrayList<>();
+
+		int zeroCount = 0;
+
+		// 注文商品の最新情報をDBから取得し、商品の在庫チェックを行う
+		for (BasketBean basketBean : basket) {
+			// 該当商品のエンティティオブジェクトを生成
+			Item item = itemRepository.getReferenceById(basketBean.getId());
+			// 在庫が無い場合
+			if (item.getStock() == 0) {
+				zeroCount++; // カウントを増やす
+				itemNameListZero.add(basketBean.getName()); // 在庫なしリストに追加
+				removeList.add(basketBean); // 削除用リストに追加
+			} else if (item.getStock() < basketBean.getOrderNum()) { // 在庫数<注文数の場合
+				basketBean.setOrderNum(item.getStock()); // 注文数を現在の在庫数に変更
+				itemNameListThan.add(basketBean.getName()); // 在庫不足のリストに追加
+			}
+		}
+
+		// 全部在庫が無い場合
+		if (zeroCount == basket.size()) {
+			// セッションから買い物かごを削除
+			session.removeAttribute("basketBeans");
+		} else if (zeroCount > 0) {
+			// 在庫切れの商品をかごから削除
+			basket.removeAll(removeList);
+			// 削除後の買い物かごをセッションに保存
+			session.setAttribute("basketBeans", basket);
+		}
+
+		// 買い物かご情報から、商品ごとの金額小計を算出し、注文商品情報リストに保存
+		int totalPrice = 0;
+		int subTotal = 0;
+		for (BasketBean basketBean : basket) {
+			Item item = itemRepository.getReferenceById(basketBean.getId());
+
+			subTotal = item.getPrice() * basketBean.getOrderNum();
+
+			OrderItemBean orderItemBean = new OrderItemBean();
+			orderItemBean.setName(item.getName());
+			orderItemBean.setPrice(item.getPrice());
+			orderItemBean.setOrderNum(basketBean.getOrderNum());
+
+		}
 		//		・注文商品情報リストから合計金額を算出する
 		//		・合計金額をリクエストスコープに設定
 		//		・注文商品情報リストをリクエストスコープに設定
 		//		・注文入力フォーム情報をリクエストスコープに設定
-		//		・注文確認画面表示
+
+		// 注文確認画面表示
 		return "/client/order/check";
 	}
 
 	/**
+	 * 
+	 * 
 	 * @param session
-	 * @redirect
+	 * @redirect "client/order/complete" 注文完了画面
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderCompletePost(HttpSession session) {
-		//		・セッションスコープから注文情報を取得
-		//		・セッションスコープから買い物かご情報を取得
+		// セッションスコープから注文情報を取得
+		OrderItemBean orderItemBean = (OrderItemBean) session.getAttribute("orderItemBeans");
+		// セッションスコープから買い物かご情報を取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 		//		・注文商品の在庫チェックをする
 		//		・在庫切れまたは在庫不足の商品がある場合
 		//		-注文確認画面表示処理へリダイレクト
 		//		リダイレクト:” /client/order/check” 
 		//		・注文情報情報を元にDB登録用エンティティオブジェクトを生成
-		//		・注文テーブルおよび注文商品テーブルのDB登録実施
+		//		・注文テーブル(Order)および注文商品テーブル(OrderItem)のDB登録実施
 		//		・セッションスコープの注文入力フォーム情報と買い物かご情報を削除
-		//		・注文完了画面表示処理にリダイレクト
 
+		// 注文完了画面表示処理にリダイレクト
 		return "redirect:/client/order/complete";
 	}
 
 	/**
+	 * 注文完了画面を表示するメソッド
+	 * 
 	 * @param model
-	 * @return
+	 * @return "client/order/complete.html" 注文完了画面
 	 */
 	@RequestMapping("/client/order/complete")
 	public String orderCompleteGet(Model model) {
-		//		・注文完了画面表示
+		// 注文完了画面表示
 		return "/client/order/complete";
 	}
 }
