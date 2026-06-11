@@ -8,10 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.OrderBean;
+import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
@@ -87,5 +89,46 @@ public class ClientOrderShowController {
 
         // 注文一覧画面表示
         return "client/order/list";
+    }
+    
+
+    /**
+     * 注文詳細画面表示処理
+     *
+     * @param model Viewとの値受渡し
+     * @param id 注文ID
+     * @return "client/order/detail" 注文詳細画面へ
+     */
+    @RequestMapping(path = "/client/order/detail/{id}")
+    public String showOrderDetail(@PathVariable Integer id, Model model) {
+
+    	//注文情報を取得
+        Order order = orderRepository.findById(id).orElse(null);
+
+        //注文情報が存在しない場合
+        if (order == null) {
+            return "redirect:/syserror";
+        }
+
+        // 注文情報をOrderBeanに変換
+        OrderBean orderBean = beanTools.copyEntityToOrderBean(order);
+
+        // 注文商品情報を取得
+        List<OrderItemBean> orderItemBeans =
+                beanTools.generateOrderItemBeanList(order.getOrderItemsList());
+
+        // 合計金額を計算
+        int total = 0;
+        for (OrderItemBean orderItemBean : orderItemBeans) {
+            total += orderItemBean.getSubtotal();
+        }
+
+        // 注文詳細情報を画面に渡す
+        model.addAttribute("order", orderBean);
+        model.addAttribute("orderItemBeans", orderItemBeans);
+        model.addAttribute("total", total);
+
+        // 注文詳細画面表示
+        return "client/order/detail";
     }
 }
