@@ -193,9 +193,11 @@ public class ClientOrderRegistController {
 		// 商品削除用のリストを生成
 		List<BasketBean> removeList = new ArrayList<>();
 
+		// 在庫が0の商品をカウントする変数
 		int zeroCount = 0;
 
 		// 注文商品の最新情報をDBから取得し、商品の在庫チェックを行う
+		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean basketBean : basket) {
 			// 該当商品のエンティティオブジェクトを生成
 			Item item = itemRepository.getReferenceById(basketBean.getId());
@@ -215,12 +217,14 @@ public class ClientOrderRegistController {
 		if (zeroCount == basket.size()) {
 			// セッションから買い物かごを削除
 			session.removeAttribute("basketBeans");
+			// 在庫なしリストに追加
 			model.addAttribute("itemNameListZero", itemNameListZero);
 		} else if (zeroCount > 0) {
 			// 在庫切れの商品をかごから削除
 			basket.removeAll(removeList);
 			// 削除後の買い物かごをセッションに保存
 			session.setAttribute("basketBeans", basket);
+			// 在庫なしリストに追加
 			model.addAttribute("itemNameListZero", itemNameListZero);
 		}
 
@@ -229,18 +233,25 @@ public class ClientOrderRegistController {
 		int totalPrice = 0; // 合計金額を代入する変数
 		int subTotal = 0; // 小計を代入する変数
 
+		// // 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean basketBean : basket) {
+			// 該当商品のエンティティオブジェクトを生成
 			Item item = itemRepository.getReferenceById(basketBean.getId());
 
+			// 商品単価x注文数 で 小計を計算
 			subTotal = item.getPrice() * basketBean.getOrderNum();
 
+			// 注文商品のBeanオブジェクトを生成
 			OrderItemBean orderItemBean = new OrderItemBean();
+
+			// Beanに商品の情報をコピー
 			orderItemBean.setName(item.getName());
 			orderItemBean.setPrice(item.getPrice());
 			orderItemBean.setImage(item.getImage());
 			orderItemBean.setOrderNum(basketBean.getOrderNum());
 			orderItemBean.setSubtotal(subTotal);
 
+			// 注文商品情報リストに追加
 			orderItemList.add(orderItemBean);
 
 			// 合計金額に追加
