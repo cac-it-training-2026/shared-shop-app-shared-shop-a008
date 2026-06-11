@@ -80,6 +80,17 @@ public class ClientBasketController {
 	}
 
 	/**
+	 * 戻るボタンを押下された時に、買い物かご画面を表示するメソッド
+	 * 
+	 * @redirect "client/basket/list" 買い物かご画面
+	 */
+	@RequestMapping("/client/basket/list")
+	public String basketBack() {
+		// 買い物かご画面にリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
 	 * 買い物かごに商品追加をするメソッド
 	 * 
 	 * @param session 買い物かごリストのセッション
