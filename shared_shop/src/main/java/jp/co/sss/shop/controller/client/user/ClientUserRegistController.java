@@ -209,7 +209,7 @@ public class ClientUserRegistController {
 			BeanUtils.copyProperties(user, userBean);
 
 			//セッションスコープへユーザー情報の保存
-			session.setAttribute("user", user);
+			session.setAttribute("user", userBean);
 
 		}
 
