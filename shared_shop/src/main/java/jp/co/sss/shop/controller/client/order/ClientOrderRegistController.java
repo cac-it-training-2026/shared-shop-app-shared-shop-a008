@@ -187,7 +187,7 @@ public class ClientOrderRegistController {
 		// 注文商品情報リストを生成
 		List<OrderItemBean> orderItemList = new ArrayList<>();
 		// 在庫不足の場合のリストを生成
-		List<String> itemNameListThan = new ArrayList<>();
+		List<String> itemNameListLessThan = new ArrayList<>();
 		// 在庫が無い場合のリストを生成
 		List<String> itemNameListZero = new ArrayList<>();
 		// 商品削除用のリストを生成
@@ -206,7 +206,8 @@ public class ClientOrderRegistController {
 				removeList.add(basketBean); // 削除用リストに追加
 			} else if (item.getStock() < basketBean.getOrderNum()) { // 在庫数<注文数の場合
 				basketBean.setOrderNum(item.getStock()); // 注文数を現在の在庫数に変更
-				itemNameListThan.add(basketBean.getName()); // 在庫不足のリストに追加
+				itemNameListLessThan.add(basketBean.getName()); // 在庫不足のリストに追加
+				model.addAttribute("itemNameListLessThan", itemNameListLessThan);
 			}
 		}
 
@@ -214,16 +215,20 @@ public class ClientOrderRegistController {
 		if (zeroCount == basket.size()) {
 			// セッションから買い物かごを削除
 			session.removeAttribute("basketBeans");
+			model.addAttribute("itemNameListZero", itemNameListZero);
 		} else if (zeroCount > 0) {
 			// 在庫切れの商品をかごから削除
 			basket.removeAll(removeList);
 			// 削除後の買い物かごをセッションに保存
 			session.setAttribute("basketBeans", basket);
+			model.addAttribute("itemNameListZero", itemNameListZero);
 		}
 
 		// 買い物かご情報から、商品ごとの金額小計を算出し、注文商品情報リストに保存
-		int totalPrice = 0;
-		int subTotal = 0;
+
+		int totalPrice = 0; // 合計金額を代入する変数
+		int subTotal = 0; // 小計を代入する変数
+
 		for (BasketBean basketBean : basket) {
 			Item item = itemRepository.getReferenceById(basketBean.getId());
 
@@ -232,14 +237,25 @@ public class ClientOrderRegistController {
 			OrderItemBean orderItemBean = new OrderItemBean();
 			orderItemBean.setName(item.getName());
 			orderItemBean.setPrice(item.getPrice());
+			orderItemBean.setImage(item.getImage());
 			orderItemBean.setOrderNum(basketBean.getOrderNum());
+			orderItemBean.setSubtotal(subTotal);
 
+			orderItemList.add(orderItemBean);
+
+			// 合計金額に追加
+			totalPrice += subTotal;
 		}
-		//		・注文商品情報リストから合計金額を算出する
-		//		・合計金額をリクエストスコープに設定
-		//		・注文商品情報リストをリクエストスコープに設定
-		//		・注文入力フォーム情報をリクエストスコープに設定
 
+		// 合計金額をリクエストスコープに設定
+		model.addAttribute("total", totalPrice);
+
+		// 注文商品情報リストをリクエストスコープに設定
+		if (zeroCount != basket.size()) {
+			model.addAttribute("orderItemBeans", orderItemList);
+		}
+		// 注文入力フォーム情報をリクエストスコープに設定
+		model.addAttribute("orderForm", orderForm);
 		// 注文確認画面表示
 		return "/client/order/check";
 	}
@@ -256,6 +272,14 @@ public class ClientOrderRegistController {
 		OrderItemBean orderItemBean = (OrderItemBean) session.getAttribute("orderItemBeans");
 		// セッションスコープから買い物かご情報を取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		// セッションスコープから注文入力情報を取得
+		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+
+		// 在庫不足の場合のリストを生成
+		List<String> itemNameListLessThan = new ArrayList<>();
+		// 在庫が無い場合のリストを生成
+		List<String> itemNameListZero = new ArrayList<>();
+
 		//		・注文商品の在庫チェックをする
 		//		・在庫切れまたは在庫不足の商品がある場合
 		//		-注文確認画面表示処理へリダイレクト
@@ -263,6 +287,11 @@ public class ClientOrderRegistController {
 		//		・注文情報情報を元にDB登録用エンティティオブジェクトを生成
 		//		・注文テーブル(Order)および注文商品テーブル(OrderItem)のDB登録実施
 		//		・セッションスコープの注文入力フォーム情報と買い物かご情報を削除
+
+		// 買い物かご情報を削除
+		session.removeAttribute("basketBeans");
+		// 注文入力フォーム情報を削除
+		session.removeAttribute("orderForm");
 
 		// 注文完了画面表示処理にリダイレクト
 		return "redirect:/client/order/complete";
