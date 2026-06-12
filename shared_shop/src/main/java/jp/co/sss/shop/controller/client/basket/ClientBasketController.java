@@ -29,7 +29,7 @@ public class ClientBasketController {
 	/**
 	 * 買い物かご内の商品一覧を表示するメソッド
 	 * 
-	 * @param session 買い物かごリストのセッション
+	 * @param session セッション情報
 	 * @return "client/basket/list.html" 買い物かごの内容表示
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
@@ -93,7 +93,7 @@ public class ClientBasketController {
 	/**
 	 * 買い物かごに商品追加をするメソッド
 	 * 
-	 * @param session 買い物かごリストのセッション
+	 * @param session セッション情報
 	 * @param id 追加する商品ID
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
@@ -155,7 +155,7 @@ public class ClientBasketController {
 	/**
 	 * 買い物かごの商品を削除するメソッド
 	 * 
-	 * @param session 買い物かごリストのセッション
+	 * @param session セッション情報
 	 * @param id 削除する商品のID
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
@@ -196,7 +196,7 @@ public class ClientBasketController {
 	/**
 	 * 買い物かごの商品を全削除するメソッド
 	 * 
-	 * @param session
+	 * @param session セッション情報
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/allDelete", method = RequestMethod.POST)
