@@ -52,9 +52,9 @@ public class ClientOrderRegistController {
 	OrderItemRepository orderItemRepository;
 
 	/**
+	 * 届け先の入力を行うメソッド
 	 * 
-	 * 
-	 * @param session
+	 * @param session セッション情報
 	 * @redirect "client/order/address/input" 届け先入力画面
 	 */
 	@RequestMapping(path = "/client/order/address/input", method = RequestMethod.POST)
@@ -62,6 +62,11 @@ public class ClientOrderRegistController {
 
 		// ログイン会員情報をセッションから取得
 		UserBean loginUser = (UserBean) session.getAttribute("user");
+		// ログインユーザーがnullだった場合
+		if (loginUser == null) {
+			// ログイン画面にリダイレクト
+			return "redirect:/login";
+		}
 
 		// 取得したログイン会員情報のユーザIDを条件にDBからユーザ情報を取得
 		User user = userRepository.getReferenceById(loginUser.getId());
@@ -89,14 +94,18 @@ public class ClientOrderRegistController {
 	/**
 	 * 届け先入力画面を表示するメソッド
 	 * 
-	 * @param session
-	 * @param model
+	 * @param session セッション情報
+	 * @param model Viewとの値受渡し
 	 * @return "client/order/address_input.html" 届け先入力画面
 	 */
 	@RequestMapping("/client/order/address/input")
 	public String addressInputGet(HttpSession session, Model model) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// セッションがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
 		// 注文入力フォーム情報をリクエストスコープに設定
 		model.addAttribute("orderForm", orderForm);
 
@@ -116,17 +125,22 @@ public class ClientOrderRegistController {
 	}
 
 	/**
-	 * @param orderForm
-	 * @param result
-	 * @param session
+	 * 支払方法選択を行うメソッド
+	 * 
+	 * @param orderForm 注文入力フォーム
+	 * @param result 入力チェック結果
+	 * @param session セッション情報
 	 * @redirect "client/order/payment/input" 支払方法選択画面
 	 */
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
 	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result,
 			HttpSession session) {
-
 		// セッションスコープから注文入力フォーム情報を取得
 		orderForm = (OrderForm) session.getAttribute("orderForm");
+		// スコープがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
 		// BindingResultオブジェクトに入力エラー情報がある場合
 		if (result.hasErrors()) {
 			// 入力エラー情報をセッションスコープに設定
@@ -140,14 +154,20 @@ public class ClientOrderRegistController {
 	}
 
 	/**
-	 * @param session
-	 * @param model
+	 * 支払方法選択画面を表示するメソッド
+	 * 
+	 * @param session セッション情報
+	 * @param model Viewとの値受渡し
 	 * @return "client/order/payment_input.html" 支払方法選択画面
 	 */
 	@RequestMapping("/client/order/payment/input")
 	public String paymentInputGet(HttpSession session, Model model) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// セッションがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
 		// 注文フォーム情報をリクエストスコープに設定
 		model.addAttribute("payMethod", orderForm.getPayMethod());
 		// 支払方法選択画面表示
@@ -166,14 +186,21 @@ public class ClientOrderRegistController {
 	}
 
 	/**
-	 * @param session
-	 * @param model
+	 * 注文情報をセットするメソッド
+	 * 
+	 * @param session セッション情報
+	 * @param model Viewとの値受渡し
 	 * @redirect "client/order/check" 注文確認画面
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
 	public String orderCheckPost(HttpSession session, Model model, Integer payMethod) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// セッションがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
 		// 画面から入力された支払方法を取得した注文入力フォーム情報に設定
 		orderForm.setPayMethod(payMethod);
 		// 注文入力フォーム情報をセッションスコープに保存
@@ -183,17 +210,28 @@ public class ClientOrderRegistController {
 	}
 
 	/**
-	 * @param session
-	 * @param model
+	 * 
+	 * 
+	 * @param session セッション情報
+	 * @param model Viewとの値受渡し
 	 * @return "client/order/check.html" 注文確認画面
 	 */
 	@RequestMapping("/client/order/check")
 	public String orderCheckGet(HttpSession session, Model model) {
 		// セッションスコープから注文情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// セッションがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
 
 		// セッションスコープから買い物かご情報を取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		// セッションがnullの場合
+		if (basket == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
 		// 注文商品情報リストを生成
 		List<OrderItemBean> orderItemList = new ArrayList<>();
 		// 在庫不足の場合のリストを生成
@@ -291,23 +329,46 @@ public class ClientOrderRegistController {
 	/**
 	 * 注文情報を登録するメソッド
 	 * 
-	 * @param session
+	 * @param session セッション情報
 	 * @redirect "client/order/complete" 注文完了画面
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderCompletePost(HttpSession session, Model model) {
 		// セッションスコープから買い物かご情報を取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		// セッションがnullの場合
+		if (basket == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
 
 		// セッションスコープから注文入力情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
+		// セッションがnullの場合
+		if (orderForm == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
+		// セッションスコープから注文商品情報を取得
 		List<OrderItemBean> orderItemList = (List<OrderItemBean>) session.getAttribute("orderItemBeans");
-		List<OrderItem> orderItems = new ArrayList();
+		// セッションがnullの場合
+		if (orderItemList == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
+		// 注文商品リストの生成
+		List<OrderItem> orderItems = new ArrayList<>();
+
+		// スコープから取得したリストをエンティティにコピー
 		BeanUtils.copyProperties(orderItemList, orderItems);
 
 		// セッションスコープからログイン会員情報を取得
 		UserBean loginUser = (UserBean) session.getAttribute("user");
-		// // 取得したログイン会員情報のユーザIDを条件にDBからユーザ情報を取得
+		// セッションがnullの場合
+		if (loginUser == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
+		// 取得したログイン会員情報のユーザIDを条件にDBからユーザ情報を取得
 		User user = userRepository.getReferenceById(loginUser.getId());
 
 		// 在庫不足の場合のリストを生成
@@ -363,22 +424,35 @@ public class ClientOrderRegistController {
 			return "redirect:/client/order/check";
 		}
 
-		// 注文テーブル(Order)および注文商品テーブル(OrderItem)のDB登録実施
-		// 注文情報を元にDB登録用エンティティオブジェクトを生成
+		// DB登録処理
+		// Orderエンティティの生成
 		Order order = new Order();
+		// 注文入力フォームからフィールド名一致項目をコピー
 		BeanUtils.copyProperties(orderForm, order, "id", "insertDate", "user", "orderItemsList");
+		// 注文日付をセット
 		order.setInsertDate(new java.sql.Date(new java.util.Date().getTime()));
+		// 会員情報をセット
 		order.setUser(user);
+		// 注文商品リストをセット
 		order.setOrderItemsList(orderItems);
+		// レコードの登録
 		order = orderRepository.save(order);
 
+		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean basketBean : basket) {
+			// 買い物かごの商品を主キー検索
 			Item item = itemRepository.getReferenceById(basketBean.getId());
+			// OrderItemエンティティのオブジェクトを生成
 			OrderItem orderItem = new OrderItem();
+			// 注文個数をセット
 			orderItem.setQuantity(basketBean.getOrderNum());
+			// 注文情報をセット
 			orderItem.setOrder(order);
+			// 商品情報をセット
 			orderItem.setItem(item);
+			// 注文時点の商品単価をセット
 			orderItem.setPrice(item.getPrice());
+			// レコードの登録
 			orderItem = orderItemRepository.save(orderItem);
 		}
 
@@ -394,7 +468,7 @@ public class ClientOrderRegistController {
 	/**
 	 * 注文完了画面を表示するメソッド
 	 * 
-	 * @param model
+	 * @param model Viewとの値受渡し
 	 * @return "client/order/complete.html" 注文完了画面
 	 */
 	@RequestMapping("/client/order/complete")
