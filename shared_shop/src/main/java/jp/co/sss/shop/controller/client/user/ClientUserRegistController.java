@@ -164,6 +164,14 @@ public class ClientUserRegistController {
 		// セッションから入力フォーム情報取得
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 
+		// 入力フォーム情報に不足がある場合、
+		if (userForm == null) {
+
+			// セッションスコープから取得した値をセット
+			session.setAttribute("userForm", userForm);
+
+		}
+
 		// 入力フォーム情報をスコープへ設定
 		model.addAttribute("userForm", userForm);
 
