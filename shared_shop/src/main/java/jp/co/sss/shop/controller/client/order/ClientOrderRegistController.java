@@ -136,7 +136,12 @@ public class ClientOrderRegistController {
 	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result,
 			HttpSession session) {
 		// セッションスコープから注文入力フォーム情報を取得
-		orderForm = (OrderForm) session.getAttribute("orderForm");
+		OrderForm sessionForm = (OrderForm) session.getAttribute("orderForm");
+		// orderFormの内容をコピー
+		BeanUtils.copyProperties(orderForm, sessionForm);
+		// リクエストスコープに保存
+		session.setAttribute("orderForm", sessionForm);
+
 		// スコープがnullの場合
 		if (orderForm == null) {
 			return "redirect:/login"; // ログイン画面にリダイレクト
@@ -168,20 +173,20 @@ public class ClientOrderRegistController {
 		if (orderForm == null) {
 			return "redirect:/login"; // ログイン画面にリダイレクト
 		}
-		// 注文フォーム情報をリクエストスコープに設定
+		// 注文フォーム情報をスコープに設定
 		model.addAttribute("payMethod", orderForm.getPayMethod());
 		// 支払方法選択画面表示
 		return "/client/order/payment_input";
 	}
 
 	/**
-	 * 戻るボタンを押下された時に、支払方法選択画面を表示するメソッド
+	 * 戻るボタンを押下された時に、届け先入力画面を表示するメソッド
 	 * 
-	 * @redirect "client/order/address/input" 支払方法選択画面
+	 * @redirect "client/order/address/input" 
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
-	public String paymentBack() {
-		// 支払い方法選択画面 表示処理へリダイレクト
+	public String paymentBack(HttpSession session) {
+		// 届け先入力画面 表示処理へリダイレクト
 		return "redirect:/client/order/address/input";
 	}
 
