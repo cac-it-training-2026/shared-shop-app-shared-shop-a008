@@ -454,6 +454,11 @@ public class ClientOrderRegistController {
 			orderItem.setPrice(item.getPrice());
 			// レコードの登録
 			orderItem = orderItemRepository.save(orderItem);
+
+			// 注文商品の在庫数を減らす
+			item.setStock(item.getStock() - basketBean.getOrderNum());
+			// レコードの登録
+			itemRepository.save(item);
 		}
 
 		// 買い物かご情報を削除
