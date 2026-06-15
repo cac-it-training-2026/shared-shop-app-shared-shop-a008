@@ -244,6 +244,13 @@ public class ClientUserUpdateController {
 	 */
 	@RequestMapping(path = "/client/user/update/complete", method = RequestMethod.GET)
 	public String updateCompleteFinish() {
+		// セッションから入力フォーム情報取得
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+
+		if (loginUser == null) {
+			return "redirect:/login";
+		}
+
 		return "client/user/update_complete";
 	}
 
