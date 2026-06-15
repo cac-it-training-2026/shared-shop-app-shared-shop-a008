@@ -135,15 +135,24 @@ public class ClientItemShowController {
 				itemList = itemRepository.findAllByOrderByIdDesc();
 
 				// 売れ筋順
-			} else {
+			} else if (sortType == 2) {
 
 				// 売れ筋順の商品情報を取得する
 				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
 
+			} else {
+				return "redirect:/syserror";
 			}
 
 			// カテゴリ検索されているとき
 		} else {
+
+			if (categoryRepository.findByIdAndDeleteFlag(
+					categoryId,
+					Constant.NOT_DELETED) == null) {
+
+				return "redirect:/syserror";
+			}
 
 			// 新着順
 			if (sortType == 1) {
@@ -152,11 +161,13 @@ public class ClientItemShowController {
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
 
 				// 売れ筋順
-			} else {
+			} else if (sortType == 2) {
 
 				// 検索されたカテゴリかつ売れ筋順の商品情報を取得する
 				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
 
+			} else {
+				return "redirect:/syserror";
 			}
 
 		}

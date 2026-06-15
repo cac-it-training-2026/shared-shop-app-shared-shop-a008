@@ -1,9 +1,9 @@
 package jp.co.sss.shop.controller;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.servlet.http.HttpSession;
 
 /**
  * エラー画面表示機能のコントローラクラス
@@ -21,6 +21,9 @@ public class ErrorController {
 	 */
 	@RequestMapping(path = "/syserror")
 	public String error(HttpSession session) {
+
+		System.out.println("syserrorに到達");
+
 		// セッション情報を無効にする
 		session.invalidate();
 		return "error";
