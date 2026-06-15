@@ -68,7 +68,7 @@ public class ClientItemShowController {
 			model.addAttribute("sortType", 1);
 
 			// 新着順の商品情報を取得する
-			itemList = itemRepository.findAllByOrderByIdDesc();
+			itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
 		}
 
 		// エンティティ内の検索結果をJavaBeansにコピー
@@ -132,7 +132,7 @@ public class ClientItemShowController {
 			if (sortType == 1) {
 
 				// 新着順の商品情報を取得する
-				itemList = itemRepository.findAllByOrderByIdDesc();
+				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
 
 				// 売れ筋順
 			} else if (sortType == 2) {

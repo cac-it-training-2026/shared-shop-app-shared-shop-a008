@@ -46,11 +46,11 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	public Item findByNameAndDeleteFlag(String name, int notDeleted);
 
 	/**
-	 * 新着順の商品一覧
-	 * @param id 商品ID
+	 * 新着順の商品の一覧
+	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	List<Item> findAllByOrderByIdDesc();
+	List<Item> findByDeleteFlagOrderByIdDesc(int deleteFlag);
 
 	/**売れ筋順（注文回数が多い順）、左外部結合で注文情報がある商品だけでなく、全商品を参照
 	 * @param deleteFlag 削除フラグ
