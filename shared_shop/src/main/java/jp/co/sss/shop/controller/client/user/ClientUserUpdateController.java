@@ -56,7 +56,7 @@ public class ClientUserUpdateController {
 			if (loginUser == null) {
 
 				// 対象が無い場合、エラー
-				return "redirect:/syserror";
+				return "redirect:/login";
 			}
 
 			// セッションに保存されたIDを使用する
@@ -99,7 +99,7 @@ public class ClientUserUpdateController {
 		if (userForm == null) {
 
 			// セッション情報がない場合、エラー
-			return "redirect:/syserror";
+			return "redirect:/login";
 		}
 
 		// 入力フォーム情報を画面表示設定
@@ -134,7 +134,7 @@ public class ClientUserUpdateController {
 		if (lastUserForm == null) {
 
 			// セッション情報が無い場合、エラー
-			return "redirect:/syserror";
+			return "redirect:/login";
 		}
 
 		// 変更対象IDと権限は、変更前のセッション情報を使用する
@@ -171,7 +171,7 @@ public class ClientUserUpdateController {
 		if (userForm == null) {
 
 			// セッション情報がない場合、エラー
-			return "redirect:/syserror";
+			return "redirect:/login";
 		}
 
 		// 入力フォーム情報をスコープへ設定
@@ -193,7 +193,7 @@ public class ClientUserUpdateController {
 		if (userForm == null) {
 
 			// セッション情報がない場合、エラー
-			return "redirect:/syserror";
+			return "redirect:/login";
 		}
 
 		// セッションからログイン中のユーザー情報を取得
@@ -201,7 +201,7 @@ public class ClientUserUpdateController {
 		if (loginUser == null) {
 
 			// 対象が無い場合、エラー
-			return "redirect:/syserror";
+			return "redirect:/login";
 		}
 
 		// 一般会員変更に伴い、セッションに保存されたIDを使用する
