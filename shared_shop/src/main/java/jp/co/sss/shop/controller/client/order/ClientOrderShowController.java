@@ -102,11 +102,24 @@ public class ClientOrderShowController {
     @RequestMapping(path = "/client/order/detail/{id}")
     public String showOrderDetail(@PathVariable Integer id, Model model) {
 
+    	
+    	// セッションからログインユーザー取得
+    	UserBean loginUser = (UserBean) session.getAttribute("user");
+
+    	if (loginUser == null) {
+    	    return "redirect:/login";
+    	}
+    	
     	//注文情報を取得
         Order order = orderRepository.findById(id).orElse(null);
 
-        //注文情報が存在しない場合
+        //存在しない注文IDを入力した場合
         if (order == null) {
+            return "redirect:/syserror";
+        }
+        
+        //他ユーザーの注文情報の場合
+        if (!order.getUser().getId().equals(loginUser.getId())) {
             return "redirect:/syserror";
         }
 
