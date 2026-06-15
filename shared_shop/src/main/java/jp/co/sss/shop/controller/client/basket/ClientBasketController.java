@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.repository.ItemRepository;
 
@@ -34,7 +35,15 @@ public class ClientBasketController {
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
 	public String basketList(HttpSession session, Model model) {
-		// 買い物かごリストを取得
+
+		// ログインユーザーの取得
+		UserBean loginUser = (UserBean) session.getAttribute("user");
+		// ログインユーザーがnullの場合
+		if (loginUser == null) {
+			return "redirect:/login"; // ログイン画面にリダイレクト
+		}
+
+		// 買い物かごリストを
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
 		// 在庫不足の場合のリストを生成
