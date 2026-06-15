@@ -22,8 +22,6 @@ public class ErrorController {
 	@RequestMapping(path = "/syserror")
 	public String error(HttpSession session) {
 
-		System.out.println("syserrorに到達");
-
 		// セッション情報を無効にする
 		session.invalidate();
 		return "error";
