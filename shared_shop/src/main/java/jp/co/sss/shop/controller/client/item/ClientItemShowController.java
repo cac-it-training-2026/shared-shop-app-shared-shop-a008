@@ -69,6 +69,10 @@ public class ClientItemShowController {
 
 			// 新着順の商品情報を取得する
 			itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
+
+			if (itemList.isEmpty()) {
+				model.addAttribute("sortType", 2);
+			}
 		}
 
 		// エンティティ内の検索結果をJavaBeansにコピー
@@ -105,10 +109,6 @@ public class ClientItemShowController {
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
-
-		// カテゴリ情報をViewへ渡す（追加）
-		model.addAttribute("categories",
-				categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED));
 
 		return "client/item/detail";
 	}
