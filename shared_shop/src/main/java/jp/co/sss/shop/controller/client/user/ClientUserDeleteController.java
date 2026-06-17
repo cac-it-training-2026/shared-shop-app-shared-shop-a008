@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.UserBean;
@@ -40,8 +41,8 @@ import jp.co.sss.shop.util.Constant;
 	
 
 
-    @RequestMapping(path = "/client/user/delete/check")
-    public String useDeleteCheck(Model model) {
+    @RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
+    public String userDeleteCheck(Model model) {
     
     	// セッションからログインユーザー取得
     	UserBean loginUser = (UserBean) session.getAttribute("user");
@@ -68,22 +69,22 @@ import jp.co.sss.shop.util.Constant;
     	return"client/user/delete_check";
     }
     
-
-	/**退会確認画面表示処理
-
-	@param model Viewとの値受渡し
-	@return "client/user/delete_check" 退会確認画面
-	*/
+    /**
+     * 退会確認・完了画面表示処理
+     *
+     * @param model Viewとの値受渡し
+     * @return "client/user/delete_check" 退会確認画面
+     */
 	
-	@RequestMapping(path = "/client/user/delete/complete")
-	public String useDeleteComplete() {
+	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.POST)
+	public String userDeleteComplete() {
 
 
 	    // セッションからログインユーザー取得
 	    UserBean userBean = (UserBean) session.getAttribute("user");
 
 	    if (userBean == null) {
-	        return "redirect:/syserror";
+	        return "redirect:/login";
 	    }
 
 	    // DBから会員情報取得
@@ -108,7 +109,13 @@ import jp.co.sss.shop.util.Constant;
 	    // ログイン情報削除
 	    session.removeAttribute("user");
 
-	    // 完了画面へ
+	    // 完了画面表示処理へリダイレクト
+	    return "redirect:/client/user/delete/complete";
+	}
+	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.GET)
+	public String userDeleteCompleteFinish() {
+
+	    // 退会完了画面を表示
 	    return "client/user/delete_complete";
 	}
 }
