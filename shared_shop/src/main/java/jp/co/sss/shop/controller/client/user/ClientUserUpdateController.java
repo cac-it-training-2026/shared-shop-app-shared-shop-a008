@@ -47,6 +47,14 @@ public class ClientUserUpdateController {
 	@RequestMapping(path = "/client/user/update/input", method = RequestMethod.POST)
 	public String updateInputInit() {
 
+		// 入力エラー後に会員詳細へ戻り、再度変更ボタンを押した場合は、
+		// 前回の入力途中情報を削除してDBから初期値を取り直す
+		if (session.getAttribute("updateInputError") != null) {
+			session.removeAttribute("userForm");
+			session.removeAttribute("result");
+			session.removeAttribute("updateInputError");
+		}
+
 		// セッションスコープより入力情報を取り出す
 		UserForm userForm = (UserForm) session.getAttribute("userForm");
 		if (userForm == null) {
@@ -148,11 +156,14 @@ public class ClientUserUpdateController {
 		if (result.hasErrors()) {
 
 			session.setAttribute("result", result);
+			// 入力エラーが発生したことをセッションに保持
+			session.setAttribute("updateInputError", true);
 
 			// 変更入力画面　表示処理
 			return "redirect:/client/user/update/input";
-
 		}
+		// 入力値エラーがない場合、入力エラーフラグを削除
+		session.removeAttribute("updateInputError");
 		// 変更確認画面　表示処理
 		return "redirect:/client/user/update/check";
 	}
@@ -232,6 +243,8 @@ public class ClientUserUpdateController {
 
 		// セッション情報の削除
 		session.removeAttribute("userForm");
+		session.removeAttribute("result");
+		session.removeAttribute("updateInputError");
 
 		// 変更完了画面 表示処理
 		return "redirect:/client/user/update/complete";
