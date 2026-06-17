@@ -135,24 +135,23 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
 	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result,
 			HttpSession session) {
-		// セッションスコープから注文入力フォーム情報を取得
-		OrderForm sessionForm = (OrderForm) session.getAttribute("orderForm");
-		// orderFormの内容をコピー
-		BeanUtils.copyProperties(orderForm, sessionForm);
-		// リクエストスコープに保存
-		session.setAttribute("orderForm", sessionForm);
 
-		// スコープがnullの場合
-		if (orderForm == null) {
-			return "redirect:/login"; // ログイン画面にリダイレクト
-		}
 		// BindingResultオブジェクトに入力エラー情報がある場合
 		if (result.hasErrors()) {
 			// 入力エラー情報をセッションスコープに設定
 			session.setAttribute("errors", result);
+			// orderFormの値をセッションに登録
+			session.setAttribute("orderForm", orderForm);
 			// 届け先入力画面表示処理にリダイレクト
 			return "redirect:/client/order/address/input";
 		}
+
+		// セッションスコープから注文入力フォーム情報を取得
+		OrderForm sessionForm = (OrderForm) session.getAttribute("orderForm");
+		// orderFormの内容をコピー
+		BeanUtils.copyProperties(orderForm, sessionForm);
+		// セッションスコープに保存
+		session.setAttribute("orderForm", sessionForm);
 
 		// 支払方法選択画面表示処理にリダイレクト
 		return "redirect:/client/order/payment/input";
@@ -237,6 +236,9 @@ public class ClientOrderRegistController {
 			return "redirect:/login"; // ログイン画面にリダイレクト
 		}
 
+		// 元々のリストの要素数を保存しておく
+		int originalBasketSize = basket.size();
+
 		// 注文商品情報リストを生成
 		List<OrderItemBean> orderItemList = new ArrayList<>();
 		// 在庫不足の場合のリストを生成
@@ -272,7 +274,7 @@ public class ClientOrderRegistController {
 		}
 
 		// 全部在庫が無い場合
-		if (zeroCount == basket.size()) {
+		if (zeroCount == originalBasketSize) {
 			// セッションから買い物かごを削除
 			session.removeAttribute("basketBeans");
 			// 在庫なしリストに追加
@@ -321,7 +323,7 @@ public class ClientOrderRegistController {
 		model.addAttribute("total", totalPrice);
 
 		// 注文商品情報リストをスコープに設定
-		if (zeroCount != basket.size()) {
+		if (zeroCount != originalBasketSize) {
 			model.addAttribute("orderItemBeans", orderItemList);
 			session.setAttribute("orderItemBeans", orderItemList);
 		}

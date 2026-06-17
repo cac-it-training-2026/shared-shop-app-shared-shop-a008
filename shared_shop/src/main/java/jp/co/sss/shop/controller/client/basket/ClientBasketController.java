@@ -67,16 +67,21 @@ public class ClientBasketController {
 					itemNameListZero.add(basketBean.getName());
 					// 削除用リストに追加
 					removeList.add(basketBean);
-				} else if (session.getAttribute("stockLimit" + basketBean.getId()) != null) { // 買い物かごの数量が在庫数より多い場合
+				} else if (basketBean.getOrderNum() > item.getStock()) { // 買い物かごの数量が在庫数より多い場合
 					// 在庫不足リストに追加
 					itemNameListLessThan.add(basketBean.getName());
-					// 在庫数超過フラグを削除
-					session.removeAttribute("stockLimit" + basketBean.getId());
+					// 現在の在庫数まで減らす
+					basketBean.setOrderNum(item.getStock());
 				}
+
+				// 表示用在庫数を最新化
+				basketBean.setStock(item.getStock());
 			}
 
 			// 在庫切れのものを買い物かごから削除
 			basket.removeAll(removeList);
+			// セッションに保存
+			session.setAttribute("basketBeans", basket);
 		}
 
 		// リクエストスコープに保存
@@ -127,14 +132,7 @@ public class ClientBasketController {
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
 			if (existBasketBeans.getId() == item.getId()) {
-				// 買い物かご追加数が在庫数を上回った場合
-				if (existBasketBeans.getOrderNum() >= item.getStock()) {
-					// 在庫数超過のフラグをセッションに保存
-					session.setAttribute("stockLimit" + item.getId(), true);
-				} else { // 買い物かごに追加可能な場合
-					// 商品注文個数を現在の個数＋1する
-					existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
-				}
+				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
 
 				// フラグをtrueに設定
 				exist = true;
