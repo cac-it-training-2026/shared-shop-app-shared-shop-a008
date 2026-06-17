@@ -39,9 +39,30 @@ import jp.co.sss.shop.util.Constant;
 	UserRepository userRepository;
 	
 	
+	/**
+	 * 退会確認画面表示への入口
+	 *
+	 * @return "redirect:/client/user/delete/check" 退会確認画面表示処理
+	 */
+	@RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
+	public String userDeleteCheckInit() {
 
+		UserBean loginUser = (UserBean) session.getAttribute("user");
 
-    @RequestMapping(path = "/client/user/delete/check", method = RequestMethod.POST)
+	 	if (loginUser == null) {
+	        return "redirect:/login";
+	 	}
+	    // 退会確認画面表示処理へリダイレクト
+	    return "redirect:/client/user/delete/check";
+		}
+
+	/**
+	 * 退会確認画面に実際に表示する処理
+	 *
+	 * @param model Viewとの値受渡し
+	 * @return "client/user/delete_check" 退会確認画面
+	 */
+    @RequestMapping(path = "/client/user/delete/check", method = RequestMethod.GET)
     public String userDeleteCheck(Model model) {
     
     	// セッションからログインユーザー取得
@@ -112,6 +133,7 @@ import jp.co.sss.shop.util.Constant;
 	    // 完了画面表示処理へリダイレクト
 	    return "redirect:/client/user/delete/complete";
 	}
+	
 	@RequestMapping(path = "/client/user/delete/complete", method = RequestMethod.GET)
 	public String userDeleteCompleteFinish() {
 
