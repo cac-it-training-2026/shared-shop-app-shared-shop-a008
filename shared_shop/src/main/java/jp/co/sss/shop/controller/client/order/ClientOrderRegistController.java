@@ -51,6 +51,10 @@ public class ClientOrderRegistController {
 	@Autowired
 	OrderItemRepository orderItemRepository;
 
+	/** セッションオブジェクトを生成 */
+	@Autowired
+	HttpSession session;
+
 	/**
 	 * 届け先の入力を行うメソッド
 	 * 
@@ -58,7 +62,7 @@ public class ClientOrderRegistController {
 	 * @redirect "client/order/address/input" 届け先入力画面
 	 */
 	@RequestMapping(path = "/client/order/address/input", method = RequestMethod.POST)
-	public String addressInputPost(HttpSession session) {
+	public String addressInputPost() {
 
 		// ログイン会員情報をセッションから取得
 		UserBean loginUser = (UserBean) session.getAttribute("user");
@@ -99,7 +103,7 @@ public class ClientOrderRegistController {
 	 * @return "client/order/address_input.html" 届け先入力画面
 	 */
 	@RequestMapping("/client/order/address/input")
-	public String addressInputGet(HttpSession session, Model model) {
+	public String addressInputGet(Model model) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
 		// セッションがnullの場合
@@ -133,8 +137,7 @@ public class ClientOrderRegistController {
 	 * @redirect "client/order/payment/input" 支払方法選択画面
 	 */
 	@RequestMapping(path = "/client/order/payment/input", method = RequestMethod.POST)
-	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result,
-			HttpSession session) {
+	public String paymentInputPost(@Valid @ModelAttribute OrderForm orderForm, BindingResult result) {
 
 		// BindingResultオブジェクトに入力エラー情報がある場合
 		if (result.hasErrors()) {
@@ -165,7 +168,7 @@ public class ClientOrderRegistController {
 	 * @return "client/order/payment_input.html" 支払方法選択画面
 	 */
 	@RequestMapping("/client/order/payment/input")
-	public String paymentInputGet(HttpSession session, Model model) {
+	public String paymentInputGet(Model model) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
 		// セッションがnullの場合
@@ -184,7 +187,7 @@ public class ClientOrderRegistController {
 	 * @redirect "client/order/address/input" 
 	 */
 	@RequestMapping(path = "/client/order/payment/back", method = RequestMethod.POST)
-	public String paymentBack(HttpSession session) {
+	public String paymentBack() {
 		// 届け先入力画面 表示処理へリダイレクト
 		return "redirect:/client/order/address/input";
 	}
@@ -197,7 +200,7 @@ public class ClientOrderRegistController {
 	 * @redirect "client/order/check" 注文確認画面
 	 */
 	@RequestMapping(path = "/client/order/check", method = RequestMethod.POST)
-	public String orderCheckPost(HttpSession session, Model model, Integer payMethod) {
+	public String orderCheckPost(Model model, Integer payMethod) {
 		// セッションスコープから注文入力フォーム情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
 		// セッションがnullの場合
@@ -221,7 +224,7 @@ public class ClientOrderRegistController {
 	 * @return "client/order/check.html" 注文確認画面
 	 */
 	@RequestMapping("/client/order/check")
-	public String orderCheckGet(HttpSession session, Model model) {
+	public String orderCheckGet(Model model) {
 		// セッションスコープから注文情報を取得
 		OrderForm orderForm = (OrderForm) session.getAttribute("orderForm");
 		// セッションがnullの場合
@@ -340,7 +343,7 @@ public class ClientOrderRegistController {
 	 * @redirect "client/order/complete" 注文完了画面
 	 */
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
-	public String orderCompletePost(HttpSession session, Model model) {
+	public String orderCompletePost(Model model) {
 		// セッションスコープから買い物かご情報を取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 		// セッションがnullの場合

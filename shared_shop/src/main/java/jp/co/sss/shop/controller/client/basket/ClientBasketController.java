@@ -27,6 +27,10 @@ public class ClientBasketController {
 	@Autowired
 	ItemRepository itemRepository;
 
+	/** セッションオブジェクト生成 */
+	@Autowired
+	HttpSession session;
+
 	/**
 	 * 買い物かご内の商品一覧を表示するメソッド
 	 * 
@@ -34,7 +38,7 @@ public class ClientBasketController {
 	 * @return "client/basket/list.html" 買い物かごの内容表示
 	 */
 	@RequestMapping(path = "/client/basket/list", method = RequestMethod.GET)
-	public String basketList(HttpSession session, Model model) {
+	public String basketList(Model model) {
 
 		// ログインユーザーの取得
 		UserBean loginUser = (UserBean) session.getAttribute("user");
@@ -112,7 +116,7 @@ public class ClientBasketController {
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
-	public String basketAdd(HttpSession session, Integer id) {
+	public String basketAdd(Integer id) {
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
@@ -167,7 +171,7 @@ public class ClientBasketController {
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/delete", method = RequestMethod.POST)
-	public String basketDelete(HttpSession session, Integer id) {
+	public String basketDelete(Integer id) {
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
@@ -207,7 +211,7 @@ public class ClientBasketController {
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/allDelete", method = RequestMethod.POST)
-	public String basketAllDelete(HttpSession session) {
+	public String basketAllDelete() {
 		// セッションの破棄
 		session.removeAttribute("basketBeans");
 		// 買い物かごリストにリダイレクト
