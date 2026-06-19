@@ -111,12 +111,12 @@ public class ClientBasketController {
 	/**
 	 * 買い物かごに商品追加をするメソッド
 	 * 
-	 * @param session セッション情報
 	 * @param id 追加する商品ID
+	 * @param orderNum 注文数
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
-	public String basketAdd(Integer id) {
+	public String basketAdd(Integer id, Integer orderNum) {
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
@@ -124,6 +124,11 @@ public class ClientBasketController {
 		if (basket == null) {
 			// 空の買い物かごリストを生成
 			basket = new ArrayList<BasketBean>();
+		}
+
+		// 注文数が指定されていない場合や1未満の場合は1をセット
+		if (orderNum == null || orderNum < 1) {
+			orderNum = 1;
 		}
 
 		// getReferenceById(id)で主キー検索
@@ -135,8 +140,8 @@ public class ClientBasketController {
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
-			if (existBasketBeans.getId() == item.getId()) {
-				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
+			if (existBasketBeans.getId().equals(item.getId())) {
+				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + orderNum);
 
 				// フラグをtrueに設定
 				exist = true;
@@ -148,10 +153,11 @@ public class ClientBasketController {
 		if (!exist) {
 			// BasketBeanオブジェクトを生成
 			BasketBean basketBean = new BasketBean();
-			// 商品ID, 商品名, 在庫数をBeanにコピー
+			// 商品ID, 商品名, 在庫数, 注文数をBeanにコピー
 			basketBean.setId(item.getId());
 			basketBean.setName(item.getName());
 			basketBean.setStock(item.getStock());
+			basketBean.setOrderNum(orderNum);
 			// 買い物かごリストに追加
 			basket.add(basketBean);
 		}
