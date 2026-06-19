@@ -1,4 +1,5 @@
 ﻿@charset "UTF-8";
+/* Issue #17: ECサイトのデザインをブラッシュアップする */
 
 body {
 	color: #12526d;
@@ -729,4 +730,3 @@ p.link_center {
 	margin: 20px 0;
 	padding-right: 20px;
 }
-
