@@ -716,4 +716,17 @@ p.link_center {
 	display: block;
 }
 
+/* ---- カート合計表示 ---- */
+.basket_summary {
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+.basket_total_area {
+	text-align: right;
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin: 20px 0;
+	padding-right: 20px;
+}
 
