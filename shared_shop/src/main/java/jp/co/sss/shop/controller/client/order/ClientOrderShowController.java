@@ -153,7 +153,7 @@ public class ClientOrderShowController {
      * 再注文処理
      *
      * @param id 注文ID
-     * @return "redirect:/client/order/address/input" 届け先入力画面へ
+     * @return "redirect:/client/basket/list" 買い物かご画面へ
      */
     @RequestMapping(path = "/client/order/reorder/{id}", method = RequestMethod.POST)
     public String reorder(@PathVariable Integer id, Model model) {
@@ -220,10 +220,6 @@ public class ClientOrderShowController {
         // セッションに保存
         session.setAttribute("basketBeans", basket);
 
-        // 届け先入力画面の初期化処理（ClientOrderRegistControllerのaddressInputPost相当）を行うためリダイレクト
-        // 直接リダイレクトすると、orderFormの生成が行われない可能性があるため、
-        // 本来は共通化するか、ClientOrderRegistControllerのメソッドを呼ぶ形が望ましい。
-        // ここでは仕様通り届け先入力画面へリダイレクト。
-        return "redirect:/client/order/address/input";
+        return "redirect:/client/basket/list";
     }
 }
