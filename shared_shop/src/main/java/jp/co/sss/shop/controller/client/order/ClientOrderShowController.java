@@ -187,9 +187,6 @@ public class ClientOrderShowController {
 
             // 在庫チェック（注文時の数量が在庫を超えていないか）
             if (item.getStock() < orderItem.getQuantity()) {
-                // 在庫不足の場合はエラーメッセージを表示し、詳細画面へ戻す等の処理が必要だが、
-                // 今回は仕様に基づき、追加可能なもののみ追加するか、エラーとする。
-                // 受け入れ条件: "在庫数を超える数量は追加せず、エラーメッセージを表示すること。"
                 model.addAttribute("error", "在庫不足の商品が含まれているため、再注文できません。");
                 return showOrderDetail(id, model);
             }
