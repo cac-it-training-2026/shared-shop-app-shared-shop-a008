@@ -10,6 +10,10 @@
 <body class="user">
 	<h2 th:class="title" th:text="#{order}+#{title.detail}"></h2>
 
+	<div th:if="${error}" class="error">
+		<p th:text="${error}"></p>
+	</div>
+
 	<div class="info_form_area">
 		<table class="detail_table payment">
 			<tr>
@@ -62,9 +66,14 @@
 				<td class="total" th:text="${total}"></td>
 			</tr>
 		</table>
-		<form th:action="@{/client/order/list}" method="post" class="detail_button_area">
-			<input type="submit" value="戻る" class="back_button" />
-		</form>
+		<div class="detail_button_area">
+			<form th:action="@{/client/order/reorder/{id}(id=${order.id})}" method="post" style="display: inline;">
+				<input type="submit" value="再注文" class="reorder_button" />
+			</form>
+			<form th:action="@{/client/order/list}" method="post" style="display: inline;">
+				<input type="submit" value="戻る" class="back_button" />
+			</form>
+		</div>
 	</div>
 </body>
 
