@@ -53,24 +53,24 @@ public class ClientMoodDiagnosisController {
 			return "client/item/mood";
 		}
 
-		String title = "";
+		String moodTitle = "";
 		int categoryIndex = -1;
 
 		switch (mood) {
 			case "relax":
-				title = "ゆっくりしたい日のおすすめ";
+				moodTitle = "ゆっくりしたい日のおすすめ";
 				categoryIndex = 0;
 				break;
 			case "focus":
-				title = "集中したい日のおすすめ";
+				moodTitle = "集中したい日のおすすめ";
 				categoryIndex = 1;
 				break;
 			case "energy":
-				title = "元気を出したい日のおすすめ";
+				moodTitle = "元気を出したい日のおすすめ";
 				categoryIndex = 2;
 				break;
 			case "gift":
-				title = "誰かに贈りたい日のおすすめ";
+				moodTitle = "誰かに贈りたい日のおすすめ";
 				categoryIndex = 3;
 				break;
 			default:
@@ -91,7 +91,7 @@ public class ClientMoodDiagnosisController {
 			model.addAttribute("items", itemBeanList);
 		}
 
-		model.addAttribute("title", title);
+		model.addAttribute("moodTitle", moodTitle);
 		model.addAttribute("mood", mood);
 
 		return "client/item/mood";

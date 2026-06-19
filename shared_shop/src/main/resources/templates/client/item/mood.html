@@ -18,7 +18,7 @@
 
 	<!-- 結果セクション -->
 	<div th:if="${mood != null}">
-		<h3 class="diagnosis_result_title" th:text="${title}"></h3>
+		<h3 class="diagnosis_result_title" th:text="${moodTitle}"></h3>
 
 		<p th:text="#{msg.client.item.list.none}" th:if="${#lists.isEmpty(items)}"></p>
 
