@@ -27,7 +27,13 @@
 			</form>
 		</div>
 		<div class="mood_diagnosis">
-			<a th:href="@{/client/item/mood/input}" class="mood_link">気分で選ぶ商品診断</a>
+			<h2 class="title">気分で選ぶ</h2>
+			<ul class="menu">
+				<li><a th:href="@{/client/item/mood(mood='relax')}" class="display_list">ゆっくりしたい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='focus')}" class="display_list">集中したい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='energy')}" class="display_list">元気を出したい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='gift')}" class="display_list">誰かに贈りたい</a></li>
+			</ul>
 		</div>
 	</div>
 

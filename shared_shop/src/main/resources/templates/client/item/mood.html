@@ -8,37 +8,20 @@
 <body class="user mood">
 	<h2 class="page_title">気分で選ぶ商品診断</h2>
 
-	<!-- 入力セクション -->
-	<div th:if="${items == null}" class="mood_form_area">
-		<p>今の気分を教えてください。あなたにぴったりの商品をご提案します。</p>
-		<form th:action="@{/client/item/mood/result}" method="post" class="mood_form">
-			<ul class="mood_radio_list">
-				<li>
-					<input type="radio" name="moodId" value="1" id="mood1" checked />
-					<label for="mood1">さわやかな気分</label>
-				</li>
-				<li>
-					<input type="radio" name="moodId" value="2" id="mood2" />
-					<label for="mood2">元気な気分</label>
-				</li>
-				<li>
-					<input type="radio" name="moodId" value="3" id="mood3" />
-					<label for="mood3">落ち着いた気分</label>
-				</li>
-			</ul>
-			<input type="submit" value="診断する" class="menu_button" />
-		</form>
+	<!-- 未選択時 -->
+	<div th:if="${mood == null}" class="message">
+		<p>左側のメニューから気分を選んでください</p>
 	</div>
 
 	<!-- 結果セクション -->
-	<div th:if="${items != null}">
-		<h3 class="diagnosis_result_title" th:text="'「' + ${selectedCategoryName} + '」に関連するおすすめの商品はこちらです'"></h3>
+	<div th:if="${mood != null}">
+		<h3 class="diagnosis_result_title" th:text="${title}"></h3>
 
 		<div th:if="${#lists.isEmpty(items)}">
 			<p>おすすめの商品が見つかりませんでした。</p>
 		</div>
 
-		<div class="item_list">
+		<div class="item_list" th:if="${not #lists.isEmpty(items)}">
 			<th:block th:each="item : ${items}">
 				<div class="item">
 					<div class="item_name" th:text="${item.name}"></div>
@@ -48,10 +31,6 @@
 					</a>
 				</div>
 			</th:block>
-		</div>
-
-		<div class="back_to_top_link">
-			<a th:href="@{/client/item/mood/input}">診断をやり直す</a>
 		</div>
 	</div>
 
