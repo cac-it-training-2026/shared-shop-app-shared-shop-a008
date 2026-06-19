@@ -1,5 +1,7 @@
 package jp.co.sss.shop.controller.login;
 
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
+import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.LoginForm;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
@@ -70,8 +73,46 @@ public class LoginController {
 
 		} else {
 			//セッションスコープから権限を取り出す
-			Integer authority = ((UserBean) session.getAttribute("user")).getAuthority();
+			UserBean loginUser = (UserBean) session.getAttribute("user");
+			Integer authority = loginUser.getAuthority();
 			if (authority.intValue() == Constant.AUTH_CLIENT) {
+
+				// おみくじ処理
+				String omikujiResult = "";
+				int bonusPoint = 0;
+
+				int randomNum = new Random().nextInt(100);
+				if (randomNum < 10) { // 10%
+					omikujiResult = "大吉";
+					bonusPoint = 30;
+				} else if (randomNum < 30) { // 20%
+					omikujiResult = "中吉";
+					bonusPoint = 20;
+				} else if (randomNum < 60) { // 30%
+					omikujiResult = "小吉";
+					bonusPoint = 10;
+				} else { // 40%
+					omikujiResult = "凶";
+					bonusPoint = 1;
+				}
+
+				// DB更新
+				User user = userRepository.getReferenceById(loginUser.getId());
+				Integer currentPoint = user.getPoint();
+				if (currentPoint == null) {
+					currentPoint = 0;
+				}
+				user.setPoint(currentPoint + bonusPoint);
+				userRepository.save(user);
+
+				// セッションに保存
+				session.setAttribute("omikujiResult", omikujiResult);
+				session.setAttribute("bonusPoint", bonusPoint);
+
+				// セッションのUserBeanも更新
+				loginUser.setPoint(user.getPoint());
+				session.setAttribute("user", loginUser);
+
 				// 一般会員ログインした場合、トップ画面表示処理にリダイレクト
 				returnStr = "redirect:/";
 			} else {
