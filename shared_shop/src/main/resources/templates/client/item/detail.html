@@ -33,6 +33,7 @@
 			</dl>
 		</div>
 		<div class="detail_button_area">
+			<!-- TODO: 数量指定用入力フィールドの追加 -->
 			<form th:action="@{/client/basket/add}" method="post" class="user_info_form" th:if="*{stock > 0}">
 				<input type="hidden" th:field="*{id}" />
 				<input type="submit" value="買い物かごに入れる" class="send_button" />
