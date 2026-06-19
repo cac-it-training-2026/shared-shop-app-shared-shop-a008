@@ -37,6 +37,7 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		// TODO: Issue #10 連続ログイン失敗時のアカウントロック機能の実装
 		BeanWrapper beanWrapper = new BeanWrapperImpl(value);
 		boolean isValidFlg = false;
 		String emailProp = (String) beanWrapper.getPropertyValue(this.email);
