@@ -34,7 +34,7 @@
 					<span class="input_value" th:text="*{phoneNumber}"></span>
 				</li>
 				<li>
-					<span class="input_title">所持ポイント</span>
+					<span class="input_title">[[#{data.user.point}]]</span>
 					<span class="input_value" th:text="*{point != null ? point : 0} + ' pt'"></span>
 				</li>
 			</ul>

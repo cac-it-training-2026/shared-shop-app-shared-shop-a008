@@ -26,6 +26,11 @@ import jp.co.sss.shop.util.Constant;
 public class LoginController {
 
 	/**
+	 * 乱数生成器
+	 */
+	private static final Random RANDOM = new Random();
+
+	/**
 	 * 会員情報
 	 */
 	@Autowired
@@ -81,23 +86,29 @@ public class LoginController {
 				String omikujiResult = "";
 				int bonusPoint = 0;
 
-				int randomNum = new Random().nextInt(100);
+				int randomNum = RANDOM.nextInt(100);
 				if (randomNum < 10) { // 10%
 					omikujiResult = "大吉";
 					bonusPoint = 30;
 				} else if (randomNum < 30) { // 20%
 					omikujiResult = "中吉";
 					bonusPoint = 20;
-				} else if (randomNum < 60) { // 30%
+				} else if (randomNum < 50) { // 20%
 					omikujiResult = "小吉";
 					bonusPoint = 10;
-				} else { // 40%
+				} else if (randomNum < 80) { // 30%
+					omikujiResult = "吉";
+					bonusPoint = 5;
+				} else { // 20%
 					omikujiResult = "凶";
-					bonusPoint = 1;
+					bonusPoint = 0;
 				}
 
 				// DB更新
-				User user = userRepository.getReferenceById(loginUser.getId());
+				User user = userRepository.findById(loginUser.getId()).orElse(null);
+				if (user == null) {
+					return "redirect:/syserror";
+				}
 				Integer currentPoint = user.getPoint();
 				if (currentPoint == null) {
 					currentPoint = 0;
