@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
     th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+
 <head>
-<title>気分で選ぶ商品診断 | シェアードショップ</title>
-<meta charset="UTF-8" />
+    <title>気分で選ぶ商品診断 | シェアードショップ</title>
+    <meta charset="UTF-8" />
 </head>
-<body class="user mood">
+
+<body class="user item_list">
+
 	<h2 class="title">気分で選ぶ商品診断</h2>
 
 	<!-- 未選択時 -->
@@ -17,9 +20,7 @@
 	<div th:if="${mood != null}">
 		<h3 class="diagnosis_result_title" th:text="${title}"></h3>
 
-		<div th:if="${#lists.isEmpty(items)}">
-			<p>おすすめの商品が見つかりませんでした。</p>
-		</div>
+		<p th:text="#{msg.client.item.list.none}" th:if="${#lists.isEmpty(items)}"></p>
 
 		<th:block th:if="!${#lists.isEmpty(items)}">
 			<table class="list_table item_detail">
@@ -44,4 +45,5 @@
 	</div>
 
 </body>
+
 </html>

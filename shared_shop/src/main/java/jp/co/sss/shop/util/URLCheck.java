@@ -114,6 +114,8 @@ public class URLCheck {
 				&& requestURL.indexOf("/client/item/list/") == -1
 				&& requestURL.indexOf("/client/item/detail/") == -1
 				&& requestURL.indexOf("/client/item/mood") == -1
+				&& requestURL.indexOf("/client/item/mood/input") == -1
+				&& requestURL.indexOf("/client/item/mood/result") == -1
 				&& requestURL.indexOf("/client/user/delete/") == -1
 				&& !requestURL.endsWith("/client/user/regist/input/init")
 				&& !requestURL.endsWith("/client/user/regist/input")
