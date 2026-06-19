@@ -60,6 +60,7 @@ public class LoginController {
 	 */
 	@RequestMapping(path = "/login", method = RequestMethod.POST)
 	public String doLogin(@Valid @ModelAttribute LoginForm form, BindingResult result) {
+		// TODO: Issue #5 おみくじログインボーナス機能の実装
 
 		String returnStr = "login";
 		if (result.hasErrors()) {
