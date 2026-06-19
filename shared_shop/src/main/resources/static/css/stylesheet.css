@@ -783,3 +783,17 @@ p.link_center {
 .mood_link:hover {
 	background-color: #b2dfdb;
 }
+
+/* 気分診断リンクの余白調整 */
+.mood_diagnosis .menu li {
+    margin-bottom: 8px;
+}
+
+.mood_diagnosis .menu li:last-child {
+    margin-bottom: 0;
+}
+
+.mood_link {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
