@@ -51,10 +51,6 @@
 				<td th:if="${item.stock >= 1 and 5 >= item.stock }" th:text="${item.stock}"></td>
 			</tr>
 		</table>
-		<div class="basket_total_area">
-			合計：<span th:text="${session.basketTotalCount ?: 0}">0</span>点
-			合計金額：¥<span th:text="${#numbers.formatInteger(session.basketTotalPrice ?: 0, 1, 'COMMA')}">0</span>
-		</div>
 		<div class="user_info_form_area shopping_button">
 			<!--/* 注文手続きフォーム */-->
 			<form th:action="@{/client/order/address/input}" method="post">

@@ -54,10 +54,4 @@ public class Constant {
 	/** 権限の値(一般会員) */
 	public static final int AUTH_CLIENT = 2;
 
-	/** 注文ステータス(注文済み) */
-	public static final String ORDER_STATUS_ORDERED = "ORDERED";
-
-	/** 注文ステータス(キャンセル済み) */
-	public static final String ORDER_STATUS_CANCELLED = "CANCELLED";
-
 }

@@ -126,9 +126,6 @@ import jp.co.sss.shop.util.Constant;
 	    
 	    // 買い物かご情報を削除
 	    session.removeAttribute("basketBeans");
-	    // カート合計情報を削除
-	    session.removeAttribute("basketTotalCount");
-	    session.removeAttribute("basketTotalPrice");
 
 	    // ログイン情報削除
 	    session.removeAttribute("user");

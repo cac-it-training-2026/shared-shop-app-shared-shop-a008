@@ -76,12 +76,6 @@ public class User {
 	private Integer deleteFlag;
 
 	/**
-	 * 所持ポイント
-	 */
-	@Column
-	private Integer point;
-
-	/**
 	 * 登録日付
 	 */
 	@Column(insertable = false)
@@ -229,22 +223,6 @@ public class User {
 	 */
 	public void setDeleteFlag(Integer deleteFlag) {
 		this.deleteFlag = deleteFlag;
-	}
-
-	/**
-	 * 所持ポイントの取得
-	 * @return 所持ポイント
-	 */
-	public Integer getPoint() {
-		return point;
-	}
-
-	/**
-	 * 所持ポイントのセット
-	 * @param point 所持ポイント
-	 */
-	public void setPoint(Integer point) {
-		this.point = point;
 	}
 
 	/**
