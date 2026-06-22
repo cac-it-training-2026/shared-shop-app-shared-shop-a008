@@ -121,7 +121,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 * @param name 商品名（キーワード）
 	 * @param kana 商品名（正規化キーワード）
 	 * @param deleteFlag 削除フラグ
-	 * @return 商品エンティティ의リスト
+	 * @return 商品エンティティのリスト
 	 */
 	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId AND (UPPER(i.name) LIKE UPPER('%' || :name || '%') OR UPPER(i.kana) LIKE UPPER('%' || :kana || '%')) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findHotSellItemsByCategoryIdAndNameOrKanaContaining(@Param("categoryId") Integer categoryId, @Param("name") String name, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);

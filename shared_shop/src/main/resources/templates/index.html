@@ -6,6 +6,10 @@
 <meta charset="UTF-8" />
 </head>
 <body class="user index">
+	<div th:if="${omikujiResult != null}" class="omikuji_area" style="background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; text-align: center;">
+		<h2 style="color: #d9534f;" th:text="#{msg.omikuji.result(${omikujiResult})}"></h2>
+		<p th:text="#{msg.omikuji.bonus(${bonusPoint})}"></p>
+	</div>
 	<div>
 		<h2 class="title">
 				<span th:if="${sortType==1}" th:text="#{sort.latest.title}"></span>

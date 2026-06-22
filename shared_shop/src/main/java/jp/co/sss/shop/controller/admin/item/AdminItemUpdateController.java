@@ -146,6 +146,9 @@ public class AdminItemUpdateController {
 			return "redirect:/syserror";
 		}
 
+		// 読み仮名を正規化（カタカナに統一）
+		form.setKana(JapaneseNormalizer.normalize(form.getKana()));
+
 		// 入力された情報をセッションに保持
 		session.setAttribute("itemForm", form);
 
@@ -220,9 +223,6 @@ public class AdminItemUpdateController {
 			// 対象が無い場合、エラー
 			return "redirect:/syserror";
 		}
-		// 読み仮名を正規化（カタカナに統一）
-		itemForm.setKana(JapaneseNormalizer.normalize(itemForm.getKana()));
-
 		// 入力値以外の情報を一時退避
 		Integer deleteFlag = item.getDeleteFlag();
 		Date insertDate = item.getInsertDate();

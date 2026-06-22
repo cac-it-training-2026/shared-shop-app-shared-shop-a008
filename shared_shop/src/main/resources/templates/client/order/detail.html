@@ -46,6 +46,13 @@
 				<th>[[#{data.address}+#{data.address.phonenumber}]]</th>
 				<td th:text="${order.phoneNumber}"></td>
 			</tr>
+			<tr>
+				<th>[[#{order}]]ステータス</th>
+				<td>
+					<span th:if="${order.status == 'ORDERED'}">[[#{order.status.ordered}]]</span>
+					<span th:if="${order.status == 'CANCELLED'}">[[#{order.status.cancelled}]]</span>
+				</td>
+			</tr>
 		</table>
 		<table class="list_table detail">
 			<tr>
@@ -67,6 +74,9 @@
 			</tr>
 		</table>
 		<div class="detail_button_area">
+			<form th:if="${order.status == 'ORDERED'}" th:action="@{/client/order/cancel/confirm/{id}(id=${order.id})}" method="post" style="display: inline;">
+				<input type="submit" value="キャンセル" class="delete_button" />
+			</form>
 			<form th:action="@{/client/order/reorder/{id}(id=${order.id})}" method="post" style="display: inline;">
 				<input type="submit" value="再注文" class="reorder_button" />
 			</form>

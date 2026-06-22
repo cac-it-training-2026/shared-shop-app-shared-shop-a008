@@ -15,7 +15,7 @@ public class JapaneseNormalizer {
      */
     public static String normalize(String text) {
         if (text == null) {
-            return "";
+            return null;
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {

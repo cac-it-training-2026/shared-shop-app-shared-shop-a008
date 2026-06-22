@@ -144,6 +144,9 @@ public class AdminItemRegistController {
 			return "redirect:/syserror";
 		}
 
+		// 読み仮名を正規化（カタカナに統一）
+		form.setKana(JapaneseNormalizer.normalize(form.getKana()));
+
 		// 入力フォームをセッションに保持
 		session.setAttribute("itemForm", form);
 
@@ -204,9 +207,6 @@ public class AdminItemRegistController {
 			// セッション情報がない場合、エラー
 			return "redirect:/syserror";
 		}
-		// 読み仮名を正規化（カタカナに統一）
-		itemForm.setKana(JapaneseNormalizer.normalize(itemForm.getKana()));
-
 		// Formクラス内の各フィールドの値をエンティティにコピー
 		Item item = beanTools.copyItemFormToEntity(itemForm);
 
