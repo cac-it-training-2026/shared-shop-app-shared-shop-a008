@@ -138,7 +138,7 @@ public class ClientOrderShowController {
         }
         
         //他ユーザーの注文情報の場合
-        if (!order.getUser().getId().equals(loginUser.getId())) {
+        if (!"ADMIN".equals(loginUser.getRole()) && !order.getUser().getId().equals(loginUser.getId())) {
             return "redirect:/syserror";
         }
 

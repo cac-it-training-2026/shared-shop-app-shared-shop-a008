@@ -40,6 +40,11 @@ public class UserBean {
 	private Integer authority;
 
 	/**
+	 * 権限(文字列)
+	 */
+	private String role;
+
+	/**
 	 * 所持ポイント
 	 */
 	private Integer point;
@@ -170,6 +175,22 @@ public class UserBean {
 	 */
 	public void setAuthority(Integer authority) {
 		this.authority = authority;
+	}
+
+	/**
+	 * 権限(文字列)の取得
+	 * @return 権限(文字列)
+	 */
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	 * 権限(文字列)のセット
+	 * @param role 権限(文字列)
+	 */
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	/**

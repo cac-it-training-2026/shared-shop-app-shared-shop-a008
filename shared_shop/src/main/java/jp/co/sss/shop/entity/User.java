@@ -70,6 +70,12 @@ public class User {
 	private Integer authority;
 
 	/**
+	 * 権限(文字列)
+	 */
+	@Column
+	private String role;
+
+	/**
 	 * 削除フラグ 0:未削除、1:削除済み
 	 */
 	@Column(insertable = false)
@@ -213,6 +219,22 @@ public class User {
 	 */
 	public void setAuthority(Integer authority) {
 		this.authority = authority;
+	}
+
+	/**
+	 * 権限(文字列)の取得
+	 * @return 権限(文字列)
+	 */
+	public String getRole() {
+		return role;
+	}
+
+	/**
+	 * 権限(文字列)のセット
+	 * @param role 権限(文字列)
+	 */
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	/**
