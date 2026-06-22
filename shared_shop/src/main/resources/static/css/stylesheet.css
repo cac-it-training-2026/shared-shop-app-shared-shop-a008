@@ -353,6 +353,18 @@ li.error_msg  {
 	/* padding: 0.6em 1.8em; */
 	font-size: 1.2em;
 }
+.quantity_input {
+	margin-bottom: 10px;
+}
+.quantity_input label {
+	font-weight: bold;
+}
+.quantity_input input[type="number"] {
+	width: 60px;
+	padding: 5px;
+	border: 1px solid #808080;
+	border-radius: 4px;
+}
 .card_info {
 	padding-top: 10px;
 	border-top: 1px solid #e8e8e8;

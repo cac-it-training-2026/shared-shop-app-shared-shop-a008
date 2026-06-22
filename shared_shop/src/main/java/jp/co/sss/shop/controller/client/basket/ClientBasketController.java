@@ -114,11 +114,11 @@ public class ClientBasketController {
 	 * 
 	 * @param session セッション情報
 	 * @param id 追加する商品ID
+	 * @param orderNum 注文数
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
-	public String basketAdd(Integer id) {
-		// TODO: Issue #2 数量指定機能の実装
+	public String basketAdd(Integer id, Integer orderNum) {
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
@@ -131,14 +131,28 @@ public class ClientBasketController {
 		// getReferenceById(id)で主キー検索
 		Item item = itemRepository.getReferenceById(id);
 
+		// 注文数が指定されていない場合は1とする
+		if (orderNum == null || orderNum < 1) {
+			orderNum = 1;
+		}
+
+		// 在庫数チェック
+		if (orderNum > item.getStock()) {
+			orderNum = item.getStock();
+		}
+
 		// 同一商品が存在するかのフラグ
 		boolean exist = false;
 
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
-			if (existBasketBeans.getId() == item.getId()) {
-				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
+			if (existBasketBeans.getId().equals(item.getId())) {
+				int newOrderNum = existBasketBeans.getOrderNum() + orderNum;
+				if (newOrderNum > item.getStock()) {
+					newOrderNum = item.getStock();
+				}
+				existBasketBeans.setOrderNum(newOrderNum);
 
 				// フラグをtrueに設定
 				exist = true;
@@ -154,6 +168,7 @@ public class ClientBasketController {
 			basketBean.setId(item.getId());
 			basketBean.setName(item.getName());
 			basketBean.setStock(item.getStock());
+			basketBean.setOrderNum(orderNum);
 			// 買い物かごリストに追加
 			basket.add(basketBean);
 		}
