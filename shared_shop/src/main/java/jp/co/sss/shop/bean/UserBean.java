@@ -40,6 +40,11 @@ public class UserBean {
 	private Integer authority;
 
 	/**
+	 * 所持ポイント
+	 */
+	private Integer point;
+
+	/**
 	 * 会員IDの取得
 	 * @return 会員ID
 	 */
@@ -165,6 +170,22 @@ public class UserBean {
 	 */
 	public void setAuthority(Integer authority) {
 		this.authority = authority;
+	}
+
+	/**
+	 * 所持ポイントの取得
+	 * @return 所持ポイント
+	 */
+	public Integer getPoint() {
+		return point;
+	}
+
+	/**
+	 * 所持ポイントのセット
+	 * @param point 所持ポイント
+	 */
+	public void setPoint(Integer point) {
+		this.point = point;
 	}
 
 }

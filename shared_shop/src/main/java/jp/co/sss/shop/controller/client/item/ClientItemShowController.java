@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
 import jp.co.sss.shop.repository.CategoryRepository;
@@ -49,7 +50,15 @@ public class ClientItemShowController {
 	 * @return "index" トップ画面
 	 */
 	@RequestMapping(path = "/", method = { RequestMethod.GET, RequestMethod.POST })
-	public String index(Model model) {
+	public String index(Model model, HttpSession session) {
+
+		// おみくじ結果をセッションから取得してModelに移動し、セッションからは削除する（一度だけ表示するため）
+		if (session.getAttribute("omikujiResult") != null) {
+			model.addAttribute("omikujiResult", session.getAttribute("omikujiResult"));
+			model.addAttribute("bonusPoint", session.getAttribute("bonusPoint"));
+			session.removeAttribute("omikujiResult");
+			session.removeAttribute("bonusPoint");
+		}
 
 		//DONE
 		/*TODO 現在は全件表示を行っている
