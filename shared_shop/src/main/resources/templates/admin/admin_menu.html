@@ -15,26 +15,26 @@
 			<li>
 				<div class="title_area" th:text="#{admin.menu.user.list}"></div>
 				<div class="link_area">
-					<a th:href="@{/admin/user/list}" th:text="#{user}+#{title.list}+#{msg.regist.complete}"></a>
+					<a th:href="@{/admin/user/list}" th:text="#{admin.menu.user.list}"></a>
 				</div>
 			</li>
 			<th:block th:if="${session.user.authority == 1}">
 				<li>
 					<div class="title_area" th:text="#{admin.menu.order.list}"></div>
 					<div class="link_area">
-						<a th:href="@{/admin/order/list}" th:text="#{order}+#{title.list}+#{msg.regist.complete}"></a>
+						<a th:href="@{/admin/order/list}" th:text="#{admin.menu.order.list}"></a>
 					</div>
 				</li>
 				<li>
 					<div class="title_area" th:text="#{admin.menu.item.list}"></div>
 					<div class="link_area">
-						<a th:href="@{/admin/item/list}" th:text="#{item}+#{title.list}+#{msg.regist.complete}"></a>
+						<a th:href="@{/admin/item/list}" th:text="#{admin.menu.item.list}"></a>
 					</div>
 				</li>
 				<li>
 					<div class="title_area" th:text="#{admin.menu.category.list}"></div>
 					<div class="link_area">
-						<a th:href="@{/admin/category/list}" th:text="#{category}+#{title.list}+#{msg.regist.complete}"></a>
+						<a th:href="@{/admin/category/list}" th:text="#{admin.menu.category.list}"></a>
 					</div>
 				</li>
 			</th:block>
