@@ -33,8 +33,23 @@
 			</dl>
 		</div>
 		<div class="detail_button_area">
-			<form th:action="@{/client/basket/add}" method="post" class="user_info_form" th:if="*{stock > 0}">
+			<form th:action="@{/client/basket/add}" method="post" class="user_info_form" th:if="*{stock > 0}" th:object="${basketForm}">
+				<th:block th:if="${#fields.hasErrors()}">
+					<ul class="error_list">
+						<li th:each="err:${#fields.detailedErrors()}" th:text="${err.message}"></li>
+					</ul>
+					<br />
+				</th:block>
+				<div th:if="${stockError}" class="error_list">
+					<ul>
+						<li class="error_msg" th:text="${stockError}"></li>
+					</ul>
+					<br />
+				</div>
 				<input type="hidden" th:field="*{id}" />
+				<label><span class="input_title">[[#{data.order.num}]]</span>
+					<input type="number" th:field="*{quantity}" min="1" th:max="${item.stock}" />
+				</label>
 				<input type="submit" value="買い物かごに入れる" class="send_button" />
 			</form>
 			<form th:action="@{/client/item/list/1}" method="post">

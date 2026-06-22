@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.form.BasketForm;
 import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
@@ -119,6 +120,12 @@ public class ClientItemShowController {
 
 		// 商品情報をViewへ渡す
 		model.addAttribute("item", itemBean);
+
+		// 買い物かご用フォームをViewへ渡す
+		BasketForm basketForm = new BasketForm();
+		basketForm.setId(id);
+		basketForm.setQuantity(1);
+		model.addAttribute("basketForm", basketForm);
 
 		return "client/item/detail";
 	}
