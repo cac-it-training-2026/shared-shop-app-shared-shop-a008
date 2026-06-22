@@ -83,4 +83,40 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 */
 	@Query("SELECT i FROM Item i JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
 	List<Item> findByHotSellItems(@Param("deleteFlag") int deleteFlag);
+
+	/**
+	 * 商品名と削除フラグを条件に検索（部分一致、新着順）
+	 * @param name 商品名（キーワード）
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	List<Item> findByNameContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(String name, int deleteFlag);
+
+	/**
+	 * 商品名と削除フラグを条件に検索（部分一致、売れ筋順）
+	 * @param name 商品名（キーワード）
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND UPPER(i.name) LIKE UPPER(CONCAT('%', :name, '%')) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findHotSellItemsByNameContainingIgnoreCase(@Param("name") String name, @Param("deleteFlag") int deleteFlag);
+
+	/**
+	 * カテゴリID、商品名、削除フラグを条件に検索（部分一致、新着順）
+	 * @param categoryId カテゴリID
+	 * @param name 商品名（キーワード）
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	List<Item> findByCategoryIdAndNameContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(Integer categoryId, String name, int deleteFlag);
+
+	/**
+	 * カテゴリID、商品名、削除フラグを条件に検索（部分一致、売れ筋順）
+	 * @param categoryId カテゴリID
+	 * @param name 商品名（キーワード）
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId AND UPPER(i.name) LIKE UPPER(CONCAT('%', :name, '%')) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findHotSellItemsByCategoryIdAndNameContainingIgnoreCase(@Param("categoryId") Integer categoryId, @Param("name") String name, @Param("deleteFlag") int deleteFlag);
 }
