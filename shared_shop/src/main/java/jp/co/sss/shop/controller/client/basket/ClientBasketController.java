@@ -118,6 +118,7 @@ public class ClientBasketController {
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
 	public String basketAdd(Integer id) {
+		// TODO: Issue #2 数量指定機能の実装
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
