@@ -1,5 +1,7 @@
 package jp.co.sss.shop.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,4 +44,43 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	 * @return 商品エンティティ
 	 */
 	public Item findByNameAndDeleteFlag(String name, int notDeleted);
+
+	/**
+	 * 新着順の商品の一覧
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	List<Item> findByDeleteFlagOrderByIdDesc(int deleteFlag);
+
+	/**売れ筋順（注文回数が多い順）、左外部結合で注文情報がある商品だけでなく、全商品を参照
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findAllByHotSellItems(@Param("deleteFlag") int deleteFlag);
+
+	/**
+	 * カテゴリ検索状態の新着順の商品の一覧
+	 * @param categoryId カテゴリID
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	List<Item> findByCategoryIdAndDeleteFlagOrderByIdDesc(Integer categoryId, int deleteFlag);
+
+	/**
+	 * カテゴリ検索状態の売れ筋順の商品一覧
+	 * @param categoryId カテゴリID
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findHotSellItemsByCategory(@Param("categoryId") Integer categoryId, @Param("deleteFlag") int deleteFlag);
+
+	/**
+	 * 売れ筋順（注文回数が多い順）、内部結合で注文情報がある商品のみ参照
+	 * @param deleteFlag 削除フラグ
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findByHotSellItems(@Param("deleteFlag") int deleteFlag);
 }
