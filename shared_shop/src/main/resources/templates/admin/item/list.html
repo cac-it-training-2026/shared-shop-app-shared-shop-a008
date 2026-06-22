@@ -7,82 +7,76 @@
 	<meta charset="UTF-8" />
 </head>
 
-<body class="admin item_list_admin">
-<div class="item_list_admin">
-	<h2 th:class="title" th:text="#{item}+#{title.list}"></h2>
-		<!-- /*追加登録不可メッセージ */-->
-	<ul class="error_message" th:unless="${registrable}">
-	<br/>
-		<li class="error_msg">
-			<span th:text="#{msg.admin.cannot.regist(#{item})}"></span>
-		</li>
-	</ul>
+<body class="admin">
+	<h2 class="title" th:text="#{item}+#{title.list}"></h2>
+
+	<!-- /*追加登録不可メッセージ */-->
+	<div class="error_message mb-20" th:unless="${registrable}">
+		<span th:text="#{msg.admin.cannot.regist(#{item})}"></span>
+	</div>
+
 	<!--/* 登録なしメッセージ */-->
-	<div th:if="${#lists.isEmpty(items)}">
+	<div th:if="${#lists.isEmpty(items)}" class="empty-list-message">
 		<p th:text="#{msg.admin.list.none(#{item})}"></p>
 	</div>
-	<form th:action="@{/admin/item/regist/input}" method="post" class="sign_up_form">
-		<input type="submit" value="商品新規登録" class="menu_button" th:if="${registrable}" />
-	</form>
+
+	<div class="right-aligned-container mb-20">
+		<form th:action="@{/admin/item/regist/input}" method="post">
+			<input type="submit" th:value="#{item}+#{title.input.new}" class="send_button" th:if="${registrable}" />
+		</form>
+	</div>
 
 	<!--/* 一覧表示 */-->
-	<div class="item_list_table">
-	<table class="list_table item_list" th:if="!${#lists.isEmpty(items)}">
-		<tbody>
-		<tr>
-			<th>[[#{data.id}]]</th>
-			<th>[[#{itemForm.name}]]</th>
-			<th>[[#{itemForm.price}]]</th>
-			<th>[[#{data.category}]]</th>
-			<th>[[#{data.operate}]]</th>
-		</tr>
-		<!--/* 商品情報 */-->
-		<tr th:each="item: ${items}">
-			<td th:text="${item.id}"></td>
-			<td><a th:href="@{/admin/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
-			<td th:text="${item.price}"></td>
-			<td th:text="${item.category.name}"></td>
-			<td>
-				<form th:action="@{/admin/item/update/input/{id}(id=${item.id})}" method="post">
-					<input type="submit" value="変更" />
-				</form>
-				<form th:action="@{/admin/item/delete/check/{id}(id=${item.id})}" method="post">
-					<input type="submit" value="削除" class="delete" />
-				</form>
-			</td>
-		</tr>
-		</tbody>
-	</table>
+	<div class="item_list_table" th:if="!${#lists.isEmpty(items)}">
+		<table class="list_table">
+			<thead>
+				<tr>
+					<th>[[#{data.id}]]</th>
+					<th class="text-left">[[#{itemForm.name}]]</th>
+					<th>[[#{itemForm.price}]]</th>
+					<th>[[#{data.category}]]</th>
+					<th>[[#{data.operate}]]</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--/* 商品情報 */-->
+				<tr th:each="item: ${items}">
+					<td th:text="${item.id}"></td>
+					<td class="text-left"><a th:href="@{/admin/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
+					<td>¥<span th:text="${#numbers.formatInteger(item.price, 1, 'COMMA')}"></span></td>
+					<td th:text="${item.category.name}"></td>
+					<td>
+						<div class="operation-buttons">
+							<form th:action="@{/admin/item/update/input/{id}(id=${item.id})}" method="post">
+								<input type="submit" th:value="#{title.update.input}" class="btn-small" />
+							</form>
+							<form th:action="@{/admin/item/delete/check/{id}(id=${item.id})}" method="post">
+								<input type="submit" th:value="#{title.delete.check}" class="delete btn-small" />
+							</form>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
+
 	<!--/* ページング */-->
 	<ul class="paging" th:if="!${#lists.isEmpty(items)}">
-		<!-- 先頭のページリンク表示処理 --> 
-		<!--1ページ目の場合はクラスの名前をdisabledに設定-->
 		<li th:class="${pages.first} ? 'disabled':''">
-			<!--1ページ目の場合は<<を表示-->
 			<span th:if="${pages.first}">&lt;&lt;</span>
-			<!-- 1ページ目ではない場合、１ページ目のリンクを表示-->
 			<a th:if="${not pages.first}" th:href="@{${url}(page=0)}">&lt;&lt;</a>
 		</li>
-		<!--ページ番号指定のリンク表示処理--> 
-		<!-- #numbersのsequence()メソッドを使用して配列を作成し、被繰り返し変数として利用 -->
-		<li th:each='i : ${#numbers.sequence(0, pages.totalPages-1)}' th:class="(${i}==${pages.number})? 'active' : ''">
+		<li th:each='i : ${#numbers.sequence(0, pages.totalPages-1)}' th:class="(${i}==${pages.number})? 'current' : ''">
 			<span th:if='${i}==${pages.number}' th:text='${i+1}'>1</span>
 			<a th:if='${i}!=${pages.number}' th:href="@{${url}(page=${i})}">
 				<span th:text='${i+1}'>1</span>
 			</a>
 		</li>
-		<!-- 末尾ページのリンク --> 
-		<!--1ページ目の場合はクラスの名前をdisabledに設定--> 
 		<li th:class="${pages.last} ? 'disabled':''">
-			<!--末尾のページの場合は>>を表示-->
 			<span th:if="${pages.last}">&gt;&gt;</span>
-			<!-- 末尾ページではない場合、末尾ページへのリンクを表示-->
 			<a th:if="${not pages.last}" th:href="@{${url}(page=(${pages.totalPages}-1))}">&gt;&gt;</a>
 		</li>
 	</ul>
-
-</div>
 </body>
 
 </html>
