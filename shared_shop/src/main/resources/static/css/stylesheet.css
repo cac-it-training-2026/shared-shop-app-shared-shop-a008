@@ -395,6 +395,11 @@ li.error_msg  {
 }
 
 /* ---- 検索フォーム ---- */
+.search_form {
+	margin-top: 25px;
+	margin-bottom: 10px;
+}
+
 .search [type=text] {
 	width: 115px;
 }
