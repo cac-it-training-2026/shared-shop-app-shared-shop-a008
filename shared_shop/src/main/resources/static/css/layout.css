@@ -135,6 +135,7 @@ header .container {
     padding: 15px 0;
     text-align: center;
     font-size: 1rem;
+    font-weight: bold; /* ナビゲーションテキストを太字に設定 */
     border-right: 1px solid var(--border-color);
     transition: background-color 0.3s, color 0.3s;
 }
