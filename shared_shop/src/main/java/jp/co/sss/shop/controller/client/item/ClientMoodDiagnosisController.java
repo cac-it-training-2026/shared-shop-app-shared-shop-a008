@@ -1,5 +1,6 @@
 package jp.co.sss.shop.controller.client.item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,46 +55,52 @@ public class ClientMoodDiagnosisController {
 		}
 
 		String moodTitle = "";
-		int categoryIndex = -1;
+		List<Item> itemList = new ArrayList<>();
 
 		switch (mood) {
 			case "relax":
 				moodTitle = "ゆっくりしたい日のおすすめ";
-				categoryIndex = 0;
+				itemList = getItemsByCategoryName("書籍");
 				break;
 			case "focus":
 				moodTitle = "集中したい日のおすすめ";
-				categoryIndex = 1;
+				itemList = getItemsByCategoryName("書籍");
 				break;
 			case "energy":
 				moodTitle = "元気を出したい日のおすすめ";
-				categoryIndex = 2;
+				itemList = getItemsByCategoryName("食料品");
 				break;
 			case "gift":
 				moodTitle = "誰かに贈りたい日のおすすめ";
-				categoryIndex = 3;
+				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+				if (itemList.isEmpty()) {
+					itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
+				}
 				break;
 			default:
 				return "client/item/mood";
 		}
 
-		// カテゴリ情報を取得
-		List<Category> categories = categoryRepository.findByDeleteFlagOrderByInsertDateDescIdDesc(Constant.NOT_DELETED);
-
-		// mood に基づいてカテゴリを選択
-		if (categoryIndex >= 0 && categoryIndex < categories.size()) {
-			Category selectedCategory = categories.get(categoryIndex);
-			// 該当カテゴリの商品を取得
-			List<Item> itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(selectedCategory.getId(),
-					Constant.NOT_DELETED);
-			// ItemBeanに変換
-			List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
-			model.addAttribute("items", itemBeanList);
-		}
-
+		// ItemBeanに変換
+		List<ItemBean> itemBeanList = beanTools.copyEntityListToItemBeanList(itemList);
+		model.addAttribute("items", itemBeanList);
 		model.addAttribute("moodTitle", moodTitle);
 		model.addAttribute("mood", mood);
 
 		return "client/item/mood";
+	}
+
+	/**
+	 * カテゴリ名で商品リストを取得
+	 *
+	 * @param categoryName カテゴリ名
+	 * @return 商品エンティティのリスト
+	 */
+	private List<Item> getItemsByCategoryName(String categoryName) {
+		Category category = categoryRepository.findByNameAndDeleteFlag(categoryName, Constant.NOT_DELETED);
+		if (category != null) {
+			return itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(category.getId(), Constant.NOT_DELETED);
+		}
+		return new ArrayList<>();
 	}
 }
