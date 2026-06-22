@@ -723,8 +723,14 @@ p.link_center {
 
 /* ---- カート合計表示 ---- */
 .basket_summary {
+	color: #12526d;
+	text-decoration: none;
 	font-weight: bold;
 	margin-right: 10px;
+}
+
+.basket_summary:hover {
+	text-decoration: underline;
 }
 
 .basket_total_area {

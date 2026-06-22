@@ -79,7 +79,7 @@ public class User {
 	 * 所持ポイント
 	 */
 	@Column
-	private Integer point;
+	private Integer point = 0;
 
 	/**
 	 * 登録日付
