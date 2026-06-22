@@ -221,7 +221,7 @@ public class AdminItemUpdateController {
 			return "redirect:/syserror";
 		}
 		// 読み仮名を正規化（カタカナに統一）
-		itemForm.setKana(JapaneseNormalizer.toKatakana(itemForm.getKana()));
+		itemForm.setKana(JapaneseNormalizer.normalize(itemForm.getKana()));
 
 		// 入力値以外の情報を一時退避
 		Integer deleteFlag = item.getDeleteFlag();

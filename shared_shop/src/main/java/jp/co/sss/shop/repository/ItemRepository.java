@@ -85,38 +85,44 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	List<Item> findByHotSellItems(@Param("deleteFlag") int deleteFlag);
 
 	/**
-	 * 商品名（ふりがな）と削除フラグを条件に検索（部分一致、新着順）
-	 * @param kana 商品名（キーワード）
+	 * 商品名またはふりがな、および削除フラグを条件に検索（部分一致、新着順）
+	 * @param name 商品名（キーワード）
+	 * @param kana 商品名（正規化キーワード）
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	List<Item> findByKanaContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(String kana, int deleteFlag);
+	@Query("SELECT i FROM Item i WHERE i.deleteFlag = :deleteFlag AND (i.name LIKE %:name% OR i.kana LIKE %:kana%) ORDER BY i.id DESC")
+	List<Item> findByNameOrKanaContaining(@Param("name") String name, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
 
 	/**
-	 * 商品名（ふりがな）と削除フラグを条件に検索（部分一致、売れ筋順）
-	 * @param kana 商品名（キーワード）
+	 * 商品名またはふりがな、および削除フラグを条件に検索（部分一致、売れ筋順）
+	 * @param name 商品名（キーワード）
+	 * @param kana 商品名（正規化キーワード）
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND UPPER(i.kana) LIKE UPPER(CONCAT('%', :kana, '%')) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
-	List<Item> findHotSellItemsByKanaContainingIgnoreCase(@Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND (i.name LIKE %:name% OR i.kana LIKE %:kana%) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findHotSellItemsByNameOrKanaContaining(@Param("name") String name, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
 
 	/**
-	 * カテゴリID、商品名（ふりがな）、削除フラグを条件に検索（部分一致、新着順）
+	 * カテゴリID、商品名またはふりがな、および削除フラグを条件に検索（部分一致、新着順）
 	 * @param categoryId カテゴリID
-	 * @param kana 商品名（キーワード）
+	 * @param name 商品名（キーワード）
+	 * @param kana 商品名（正規化キーワード）
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	List<Item> findByCategoryIdAndKanaContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(Integer categoryId, String kana, int deleteFlag);
+	@Query("SELECT i FROM Item i WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId AND (i.name LIKE %:name% OR i.kana LIKE %:kana%) ORDER BY i.id DESC")
+	List<Item> findByCategoryIdAndNameOrKanaContaining(@Param("categoryId") Integer categoryId, @Param("name") String name, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
 
 	/**
-	 * カテゴリID、商品名（ふりがな）、削除フラグを条件に検索（部分一致、売れ筋順）
+	 * カテゴリID、商品名またはふりがな、および削除フラグを条件に検索（部分一致、売れ筋順）
 	 * @param categoryId カテゴリID
-	 * @param kana 商品名（キーワード）
+	 * @param name 商品名（キーワード）
+	 * @param kana 商品名（正規化キーワード）
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
 	 */
-	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId AND UPPER(i.kana) LIKE UPPER(CONCAT('%', :kana, '%')) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
-	List<Item> findHotSellItemsByCategoryIdAndKanaContainingIgnoreCase(@Param("categoryId") Integer categoryId, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId AND (i.name LIKE %:name% OR i.kana LIKE %:kana%) GROUP BY i ORDER BY COUNT(oi.id) DESC, i.id ASC")
+	List<Item> findHotSellItemsByCategoryIdAndNameOrKanaContaining(@Param("categoryId") Integer categoryId, @Param("name") String name, @Param("kana") String kana, @Param("deleteFlag") int deleteFlag);
 }
