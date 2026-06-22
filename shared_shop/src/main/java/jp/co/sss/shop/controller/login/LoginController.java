@@ -1,7 +1,5 @@
 package jp.co.sss.shop.controller.login;
 
-import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.UserBean;
-import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.LoginForm;
 import jp.co.sss.shop.repository.UserRepository;
 import jp.co.sss.shop.util.Constant;
@@ -24,11 +21,6 @@ import jp.co.sss.shop.util.Constant;
  */
 @Controller
 public class LoginController {
-
-	/**
-	 * 乱数生成器
-	 */
-	private static final Random RANDOM = new Random();
 
 	/**
 	 * 会員情報
@@ -77,61 +69,9 @@ public class LoginController {
 			returnStr = "login";
 
 		} else {
-			// 会員情報を取得
-			User user = userRepository.findByEmailAndDeleteFlag(form.getEmail(), Constant.NOT_DELETED);
-
-			// UserBeanに情報をコピー
-			UserBean userBean = new UserBean();
-			userBean.setId(user.getId());
-			userBean.setName(user.getName());
-			userBean.setAuthority(user.getAuthority());
-			userBean.setPoint(user.getPoint());
-
-			// セッションにログイン情報を登録
-			session.setAttribute("user", userBean);
-
-			// 権限を取得
-			Integer authority = userBean.getAuthority();
-
+			//セッションスコープから権限を取り出す
+			Integer authority = ((UserBean) session.getAttribute("user")).getAuthority();
 			if (authority.intValue() == Constant.AUTH_CLIENT) {
-
-				// おみくじ処理
-				String omikujiResult = "";
-				int bonusPoint = 0;
-
-				int randomNum = RANDOM.nextInt(100);
-				if (randomNum < 10) { // 10%
-					omikujiResult = "大吉";
-					bonusPoint = 30;
-				} else if (randomNum < 30) { // 20%
-					omikujiResult = "中吉";
-					bonusPoint = 20;
-				} else if (randomNum < 50) { // 20%
-					omikujiResult = "小吉";
-					bonusPoint = 10;
-				} else if (randomNum < 80) { // 30%
-					omikujiResult = "吉";
-					bonusPoint = 5;
-				} else { // 20%
-					omikujiResult = "凶";
-					bonusPoint = 0;
-				}
-
-				// DB更新
-				Integer currentPoint = user.getPoint();
-				if (currentPoint == null) {
-					currentPoint = 0;
-				}
-				user.setPoint(currentPoint + bonusPoint);
-				userRepository.save(user);
-
-				// セッションに保存
-				session.setAttribute("omikujiResult", omikujiResult);
-				session.setAttribute("bonusPoint", bonusPoint);
-
-				// セッションのUserBeanも更新
-				userBean.setPoint(user.getPoint());
-
 				// 一般会員ログインした場合、トップ画面表示処理にリダイレクト
 				returnStr = "redirect:/";
 			} else {

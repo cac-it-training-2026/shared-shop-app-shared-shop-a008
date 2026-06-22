@@ -46,13 +46,6 @@
 				<th>[[#{data.address}+#{data.address.phonenumber}]]</th>
 				<td class="value" th:text="*{phoneNumber}"></td>
 			</tr>
-			<tr>
-				<th>[[#{order}]]ステータス</th>
-				<td>
-					<span th:if="*{status == 'ORDERED'}">[[#{order.status.ordered}]]</span>
-					<span th:if="*{status == 'CANCELLED'}">[[#{order.status.cancelled}]]</span>
-				</td>
-			</tr>
 		</table>
 
 		<table class="list_table detail">

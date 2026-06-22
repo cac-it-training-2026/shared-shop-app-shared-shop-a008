@@ -17,8 +17,6 @@
 			<th>[[#{data.client.order.date}]]</th>
 			<th>[[#{paymethod.str}]]</th>
 			<th>[[#{data.total.price}]]</th>
-			<th>[[#{order}]]ステータス</th>
-			<th>[[#{list.title.action}]]</th>
 		</tr>
 		<tr th:each="order: ${orders}">
 			<td><a th:href="@{/client/order/detail/{id}(id=${order.id})}" th:text="${order.insertDate}"></a></td>
@@ -30,15 +28,6 @@
 				<span th:case="5">[[#{paymethod.convenience.str}]]</span>
 			</td>
 			<td th:text="${order.total}" class="text"></td>
-			<td>
-				<span th:if="${order.status == 'ORDERED'}">[[#{order.status.ordered}]]</span>
-				<span th:if="${order.status == 'CANCELLED'}">[[#{order.status.cancelled}]]</span>
-			</td>
-			<td>
-				<form th:if="${order.status == 'ORDERED'}" th:action="@{/client/order/cancel/confirm/{id}(id=${order.id})}" method="post">
-					<input type="submit" value="キャンセル" class="delete_button" />
-				</form>
-			</td>
 		</tr>
 	</table>
 </body>

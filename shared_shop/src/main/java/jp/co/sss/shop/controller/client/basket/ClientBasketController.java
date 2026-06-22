@@ -93,7 +93,6 @@ public class ClientBasketController {
 		model.addAttribute("itemNameListZero", itemNameListZero);
 
 		// templates/client/basket/list.htmlに遷移
-		updateBasketSummary(session);
 		return "client/basket/list";
 
 	}
@@ -160,8 +159,6 @@ public class ClientBasketController {
 		// セッションスコープに保存
 		session.setAttribute("basketBeans", basket);
 
-		updateBasketSummary(session);
-
 		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
 	}
@@ -203,8 +200,6 @@ public class ClientBasketController {
 			session.setAttribute("basketBeans", basket);
 		}
 
-		updateBasketSummary(session);
-
 		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
 	}
@@ -219,34 +214,7 @@ public class ClientBasketController {
 	public String basketAllDelete() {
 		// セッションの破棄
 		session.removeAttribute("basketBeans");
-
-		updateBasketSummary(session);
-
 		// 買い物かごリストにリダイレクト
 		return "redirect:/client/basket/list";
-	}
-
-	/**
-	 * 買い物かご内の合計点数と合計金額を計算し、セッションに保存する
-	 *
-	 * @param session セッション情報
-	 */
-	private void updateBasketSummary(HttpSession session) {
-		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
-		int totalCount = 0;
-		int totalPrice = 0;
-
-		if (basket != null && !basket.isEmpty()) {
-			for (BasketBean bean : basket) {
-				Item item = itemRepository.findByIdAndDeleteFlag(bean.getId(), jp.co.sss.shop.util.Constant.NOT_DELETED);
-				if (item != null) {
-					totalCount += bean.getOrderNum();
-					totalPrice += item.getPrice() * bean.getOrderNum();
-				}
-			}
-		}
-
-		session.setAttribute("basketTotalCount", totalCount);
-		session.setAttribute("basketTotalPrice", totalPrice);
 	}
 }

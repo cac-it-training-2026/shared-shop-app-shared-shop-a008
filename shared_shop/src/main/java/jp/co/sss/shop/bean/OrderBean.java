@@ -53,11 +53,6 @@ public class OrderBean {
 	private String userName;
 
 	/**
-	 * 注文ステータス
-	 */
-	private String status;
-
-	/**
 	 * 注文IDの取得
 	 * @return 注文ID
 	 */
@@ -199,22 +194,6 @@ public class OrderBean {
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
-	}
-
-	/**
-	 * 注文ステータスの取得
-	 * @return 注文ステータス
-	 */
-	public String getStatus() {
-		return status;
-	}
-
-	/**
-	 * 注文ステータスのセット
-	 * @param status 注文ステータス
-	 */
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 }
