@@ -80,6 +80,12 @@ public class Order {
 	private List<OrderItem> orderItemsList;
 
 	/**
+	 * 注文ステータス
+	 */
+	@Column(length = 20)
+	private String status;
+
+	/**
 	 * 注文IDの取得
 	 * @return 注文ID
 	 */
@@ -221,6 +227,22 @@ public class Order {
 	 */
 	public void setOrderItemsList(List<OrderItem> orderItemsList) {
 		this.orderItemsList = orderItemsList;
+	}
+
+	/**
+	 * 注文ステータスの取得
+	 * @return 注文ステータス
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * 注文ステータスのセット
+	 * @param status 注文ステータス
+	 */
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }
