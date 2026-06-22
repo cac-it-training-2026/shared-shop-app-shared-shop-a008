@@ -77,9 +77,22 @@ public class LoginController {
 			returnStr = "login";
 
 		} else {
-			//セッションスコープから権限を取り出す
-			UserBean loginUser = (UserBean) session.getAttribute("user");
-			Integer authority = loginUser.getAuthority();
+			// 会員情報を取得
+			User user = userRepository.findByEmailAndDeleteFlag(form.getEmail(), Constant.NOT_DELETED);
+
+			// UserBeanに情報をコピー
+			UserBean userBean = new UserBean();
+			userBean.setId(user.getId());
+			userBean.setName(user.getName());
+			userBean.setAuthority(user.getAuthority());
+			userBean.setPoint(user.getPoint());
+
+			// セッションにログイン情報を登録
+			session.setAttribute("user", userBean);
+
+			// 権限を取得
+			Integer authority = userBean.getAuthority();
+
 			if (authority.intValue() == Constant.AUTH_CLIENT) {
 
 				// おみくじ処理
@@ -105,10 +118,6 @@ public class LoginController {
 				}
 
 				// DB更新
-				User user = userRepository.findById(loginUser.getId()).orElse(null);
-				if (user == null) {
-					return "redirect:/syserror";
-				}
 				Integer currentPoint = user.getPoint();
 				if (currentPoint == null) {
 					currentPoint = 0;
@@ -121,8 +130,7 @@ public class LoginController {
 				session.setAttribute("bonusPoint", bonusPoint);
 
 				// セッションのUserBeanも更新
-				loginUser.setPoint(user.getPoint());
-				session.setAttribute("user", loginUser);
+				userBean.setPoint(user.getPoint());
 
 				// 一般会員ログインした場合、トップ画面表示処理にリダイレクト
 				returnStr = "redirect:/";
