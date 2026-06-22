@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{common/layout_5block :: layout(~{::title},~{::body/content()})}">
+<head>
+    <title th:text="#{title.error.403}">アクセス禁止</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <div class="user_info_area">
+        <h1 th:text="#{title.error.403}">アクセス禁止</h1>
+        <p th:text="#{msg.error.403}">このページへのアクセス権限がありません。</p>
+        <div class="user_info_button_area">
+            <a th:href="@{/}" class="back_button" th:text="#{link.back.top}">トップへ戻る</a>
+        </div>
+    </div>
+</body>
+</html>

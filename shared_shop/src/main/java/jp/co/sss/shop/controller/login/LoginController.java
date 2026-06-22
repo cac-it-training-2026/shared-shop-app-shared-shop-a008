@@ -85,6 +85,7 @@ public class LoginController {
 			userBean.setId(user.getId());
 			userBean.setName(user.getName());
 			userBean.setAuthority(user.getAuthority());
+			userBean.setRole(user.getRole());
 			userBean.setPoint(user.getPoint());
 
 			// セッションにログイン情報を登録
