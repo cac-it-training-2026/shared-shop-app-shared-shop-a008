@@ -138,17 +138,22 @@ public class ClientItemShowController {
 			}
 		}
 
+		// 検索キーワードの前後の空白を削除
+		String trimmedKeyword = hasKeyword ? keyword.trim() : null;
+		hasKeyword = trimmedKeyword != null && !trimmedKeyword.isEmpty();
+
 		// 検索キーワードの正規化（カタカナに統一）
-		String normalizedKeyword = hasKeyword ? JapaneseNormalizer.normalize(keyword) : null;
+		String normalizedKeyword = hasKeyword ? JapaneseNormalizer.normalize(trimmedKeyword) : null;
 
 		// 表示順による分岐
 		if (sortType == 1) {
 			// 新着順
 			if (hasKeyword && hasCategory) {
-				itemList = itemRepository.findByCategoryIdAndNameOrKanaContaining(categoryId, keyword,
+				itemList = itemRepository.findByCategoryIdAndNameOrKanaContaining(categoryId, trimmedKeyword,
 						normalizedKeyword, Constant.NOT_DELETED);
 			} else if (hasKeyword) {
-				itemList = itemRepository.findByNameOrKanaContaining(keyword, normalizedKeyword, Constant.NOT_DELETED);
+				itemList = itemRepository.findByNameOrKanaContaining(trimmedKeyword, normalizedKeyword,
+						Constant.NOT_DELETED);
 			} else if (hasCategory) {
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
 			} else {
@@ -157,10 +162,10 @@ public class ClientItemShowController {
 		} else if (sortType == 2) {
 			// 売れ筋順
 			if (hasKeyword && hasCategory) {
-				itemList = itemRepository.findHotSellItemsByCategoryIdAndNameOrKanaContaining(categoryId, keyword,
-						normalizedKeyword, Constant.NOT_DELETED);
+				itemList = itemRepository.findHotSellItemsByCategoryIdAndNameOrKanaContaining(categoryId,
+						trimmedKeyword, normalizedKeyword, Constant.NOT_DELETED);
 			} else if (hasKeyword) {
-				itemList = itemRepository.findHotSellItemsByNameOrKanaContaining(keyword, normalizedKeyword,
+				itemList = itemRepository.findHotSellItemsByNameOrKanaContaining(trimmedKeyword, normalizedKeyword,
 						Constant.NOT_DELETED);
 			} else if (hasCategory) {
 				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
