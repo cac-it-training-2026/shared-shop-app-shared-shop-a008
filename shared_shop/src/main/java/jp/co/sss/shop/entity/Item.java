@@ -37,6 +37,12 @@ public class Item {
 	private String name;
 
 	/**
+	 * 商品名（ふりがな）
+	 */
+	@Column
+	private String kana;
+
+	/**
 	 * 価格
 	 */
 	@Column
@@ -157,6 +163,22 @@ public class Item {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * 商品名（ふりがな）の取得
+	 * @return 商品名（ふりがな）
+	 */
+	public String getKana() {
+		return kana;
+	}
+
+	/**
+	 * 商品名（ふりがな）のセット
+	 * @param kana 商品名（ふりがな）
+	 */
+	public void setKana(String kana) {
+		this.kana = kana;
 	}
 
 	/**

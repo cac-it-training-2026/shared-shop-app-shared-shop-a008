@@ -17,6 +17,7 @@ import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
+import jp.co.sss.shop.util.JapaneseNormalizer;
 
 /**
  * 商品管理 一覧表示機能(一般会員用)のコントローラクラス
@@ -129,56 +130,59 @@ public class ClientItemShowController {
 	 */
 	@RequestMapping(path = "/client/item/list/{sortType}")
 	public String showItemList(@PathVariable Integer sortType, @RequestParam(required = false) Integer categoryId,
-			Model model) {
+			@RequestParam(required = false) String keyword, Model model) {
 
 		// Item型のリストの宣言
 		List<Item> itemList;
 
-		// カテゴリ検索されていないとき
-		if (categoryId == null || categoryId == 0) {
+		// 検索キーワードの有無を確認
+		boolean hasKeyword = keyword != null && !keyword.isEmpty();
+		// カテゴリ選択の有無を確認
+		boolean hasCategory = categoryId != null && categoryId != 0;
 
-			// 新着順
-			if (sortType == 1) {
-
-				// 新着順の商品情報を取得する
-				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
-
-				// 売れ筋順
-			} else if (sortType == 2) {
-
-				// 売れ筋順の商品情報を取得する
-				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
-
-			} else {
+		if (hasCategory) {
+			// カテゴリの存在チェック
+			if (categoryRepository.findByIdAndDeleteFlag(categoryId, Constant.NOT_DELETED) == null) {
 				return "redirect:/syserror";
 			}
+		}
 
-			// カテゴリ検索されているとき
-		} else {
+		// 検索キーワードの前後の空白を削除
+		String trimmedKeyword = hasKeyword ? keyword.trim() : null;
+		hasKeyword = trimmedKeyword != null && !trimmedKeyword.isEmpty();
 
-			if (categoryRepository.findByIdAndDeleteFlag(
-					categoryId,
-					Constant.NOT_DELETED) == null) {
+		// 検索キーワードの正規化（カタカナに統一）
+		String normalizedKeyword = hasKeyword ? JapaneseNormalizer.normalize(trimmedKeyword) : null;
 
-				return "redirect:/syserror";
-			}
-
+		// 表示順による分岐
+		if (sortType == 1) {
 			// 新着順
-			if (sortType == 1) {
-
-				// 検索されたカテゴリかつ新着順の商品情報を取得する
+			if (hasKeyword && hasCategory) {
+				itemList = itemRepository.findByCategoryIdAndNameOrKanaContaining(categoryId, trimmedKeyword,
+						normalizedKeyword, Constant.NOT_DELETED);
+			} else if (hasKeyword) {
+				itemList = itemRepository.findByNameOrKanaContaining(trimmedKeyword, normalizedKeyword,
+						Constant.NOT_DELETED);
+			} else if (hasCategory) {
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
-
-				// 売れ筋順
-			} else if (sortType == 2) {
-
-				// 検索されたカテゴリかつ売れ筋順の商品情報を取得する
-				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
-
 			} else {
-				return "redirect:/syserror";
+				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
 			}
-
+		} else if (sortType == 2) {
+			// 売れ筋順
+			if (hasKeyword && hasCategory) {
+				itemList = itemRepository.findHotSellItemsByCategoryIdAndNameOrKanaContaining(categoryId,
+						trimmedKeyword, normalizedKeyword, Constant.NOT_DELETED);
+			} else if (hasKeyword) {
+				itemList = itemRepository.findHotSellItemsByNameOrKanaContaining(trimmedKeyword, normalizedKeyword,
+						Constant.NOT_DELETED);
+			} else if (hasCategory) {
+				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
+			} else {
+				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+			}
+		} else {
+			return "redirect:/syserror";
 		}
 
 		// ItemListの値をitemBeanListにコピー
@@ -192,6 +196,9 @@ public class ClientItemShowController {
 
 		// カテゴリIDをViewへ渡す
 		model.addAttribute("categoryId", categoryId);
+
+		// 検索キーワードをViewへ渡す
+		model.addAttribute("keyword", keyword);
 
 		// カテゴリ情報をViewへ渡す
 		model.addAttribute("categories",

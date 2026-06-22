@@ -22,6 +22,7 @@ import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.UploadFileService;
 import jp.co.sss.shop.util.Constant;
+import jp.co.sss.shop.util.JapaneseNormalizer;
 
 /**
  * 商品管理 変更機能のコントローラクラス
@@ -144,6 +145,9 @@ public class AdminItemUpdateController {
 			// セッション情報が無い場合、エラー
 			return "redirect:/syserror";
 		}
+
+		// 読み仮名を正規化（カタカナに統一）
+		form.setKana(JapaneseNormalizer.normalize(form.getKana()));
 
 		// 入力された情報をセッションに保持
 		session.setAttribute("itemForm", form);
