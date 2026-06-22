@@ -16,6 +16,7 @@ import jp.co.sss.shop.repository.CategoryRepository;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.util.Constant;
+import jp.co.sss.shop.util.JapaneseNormalizer;
 
 /**
  * 商品管理 一覧表示機能(一般会員用)のコントローラクラス
@@ -137,14 +138,17 @@ public class ClientItemShowController {
 			}
 		}
 
+		// 検索キーワードの正規化（カタカナに統一）
+		String normalizedKeyword = hasKeyword ? JapaneseNormalizer.toKatakana(keyword) : null;
+
 		// 表示順による分岐
 		if (sortType == 1) {
 			// 新着順
 			if (hasKeyword && hasCategory) {
-				itemList = itemRepository.findByCategoryIdAndNameContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(
-						categoryId, keyword, Constant.NOT_DELETED);
+				itemList = itemRepository.findByCategoryIdAndKanaContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(
+						categoryId, normalizedKeyword, Constant.NOT_DELETED);
 			} else if (hasKeyword) {
-				itemList = itemRepository.findByNameContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(keyword,
+				itemList = itemRepository.findByKanaContainingIgnoreCaseAndDeleteFlagOrderByIdDesc(normalizedKeyword,
 						Constant.NOT_DELETED);
 			} else if (hasCategory) {
 				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(categoryId, Constant.NOT_DELETED);
@@ -154,10 +158,11 @@ public class ClientItemShowController {
 		} else if (sortType == 2) {
 			// 売れ筋順
 			if (hasKeyword && hasCategory) {
-				itemList = itemRepository.findHotSellItemsByCategoryIdAndNameContainingIgnoreCase(categoryId, keyword,
-						Constant.NOT_DELETED);
+				itemList = itemRepository.findHotSellItemsByCategoryIdAndKanaContainingIgnoreCase(categoryId,
+						normalizedKeyword, Constant.NOT_DELETED);
 			} else if (hasKeyword) {
-				itemList = itemRepository.findHotSellItemsByNameContainingIgnoreCase(keyword, Constant.NOT_DELETED);
+				itemList = itemRepository.findHotSellItemsByKanaContainingIgnoreCase(normalizedKeyword,
+						Constant.NOT_DELETED);
 			} else if (hasCategory) {
 				itemList = itemRepository.findHotSellItemsByCategory(categoryId, Constant.NOT_DELETED);
 			} else {

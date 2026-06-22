@@ -22,6 +22,7 @@ import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.service.BeanTools;
 import jp.co.sss.shop.service.UploadFileService;
 import jp.co.sss.shop.util.Constant;
+import jp.co.sss.shop.util.JapaneseNormalizer;
 
 /**
  * 商品管理 変更機能のコントローラクラス
@@ -219,6 +220,9 @@ public class AdminItemUpdateController {
 			// 対象が無い場合、エラー
 			return "redirect:/syserror";
 		}
+		// 読み仮名を正規化（カタカナに統一）
+		itemForm.setKana(JapaneseNormalizer.toKatakana(itemForm.getKana()));
+
 		// 入力値以外の情報を一時退避
 		Integer deleteFlag = item.getDeleteFlag();
 		Date insertDate = item.getInsertDate();
