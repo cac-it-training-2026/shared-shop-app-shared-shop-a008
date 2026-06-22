@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ import jp.co.sss.shop.entity.Order;
 import jp.co.sss.shop.entity.OrderItem;
 import jp.co.sss.shop.entity.User;
 import jp.co.sss.shop.form.OrderForm;
+import jp.co.sss.shop.util.Constant;
 import jp.co.sss.shop.repository.ItemRepository;
 import jp.co.sss.shop.repository.OrderItemRepository;
 import jp.co.sss.shop.repository.OrderRepository;
@@ -342,6 +344,7 @@ public class ClientOrderRegistController {
 	 * @param session セッション情報
 	 * @redirect "client/order/complete" 注文完了画面
 	 */
+	@Transactional
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderCompletePost(Model model) {
 		// セッションスコープから買い物かご情報を取得
@@ -441,6 +444,8 @@ public class ClientOrderRegistController {
 		BeanUtils.copyProperties(orderForm, order, "id", "insertDate", "user", "orderItemsList");
 		// 注文日付をセット
 		order.setInsertDate(new java.sql.Date(new java.util.Date().getTime()));
+		// 注文ステータスをセット
+		order.setStatus(Constant.ORDER_STATUS_ORDERED);
 		// 会員情報をセット
 		order.setUser(user);
 		// 注文商品リストをセット
@@ -473,6 +478,9 @@ public class ClientOrderRegistController {
 
 		// 買い物かご情報を削除
 		session.removeAttribute("basketBeans");
+		// カート合計情報を削除
+		session.removeAttribute("basketTotalCount");
+		session.removeAttribute("basketTotalPrice");
 		// 注文入力フォーム情報を削除
 		session.removeAttribute("orderForm");
 

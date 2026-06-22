@@ -26,6 +26,15 @@
 				</select> <input type="submit" th:value="#{select}" />
 			</form>
 		</div>
+		<div class="mood_diagnosis">
+			<h2 class="title">気分で選ぶ</h2>
+			<ul class="menu">
+				<li><a th:href="@{/client/item/mood(mood='relax')}" class="display_list mood_link">ゆっくりしたい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='focus')}" class="display_list mood_link">集中したい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='energy')}" class="display_list mood_link">元気を出したい</a></li>
+				<li><a th:href="@{/client/item/mood(mood='gift')}" class="display_list mood_link">誰かに贈りたい</a></li>
+			</ul>
+		</div>
 	</div>
 
 	<!--/* メニュー(運用管理者、及びシステム管理者用) */-->
