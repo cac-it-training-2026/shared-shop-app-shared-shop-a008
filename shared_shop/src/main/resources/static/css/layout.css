@@ -65,6 +65,9 @@ ul, li {
     width: 90%;
     max-width: 1100px;
     margin: 0 auto;
+    display: flex; /* 追加：サイドバーとメインコンテンツの並び替え用 */
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .content {
@@ -77,6 +80,7 @@ header {
     background-color: var(--white);
     border-bottom: 1px solid var(--border-color);
     padding: 20px 0;
+    width: 100%; /* 全幅に広げる */
 }
 
 header .container {
@@ -113,6 +117,7 @@ header .container {
 .navi_area {
     background-color: var(--white);
     border-bottom: 1px solid var(--border-color);
+    width: 100%; /* 全幅に広げる */
 }
 
 .navi_menu {
@@ -144,19 +149,22 @@ header .container {
 }
 
 /* ---- サイドバーとメインコンテンツの配置 ---- */
-.navi_area ~ .container.content {
+.container.content {
     display: flex;
     gap: 40px;
     align-items: flex-start;
+    flex-wrap: nowrap; /* 並びを維持 */
 }
 
 .search, aside.admin_menu {
     width: 240px;
     flex-shrink: 0;
+    order: 1; /* サイドバーを左に */
 }
 
 .main {
     flex: 1;
+    order: 2; /* メインを右に */
 }
 
 /* サイドバータイトル */
@@ -257,6 +265,7 @@ footer {
     padding: 30px 0;
     text-align: center;
     margin-top: auto;
+    width: 100%;
 }
 
 small {
@@ -289,14 +298,16 @@ small {
 
 /* ---- レスポンシブ対応 (基本) ---- */
 @media (max-width: 960px) {
-    .navi_area ~ .container.content {
+    .container.content {
         flex-direction: column;
     }
     .search, aside.admin_menu {
         width: 100%;
+        order: 2; /* モバイルではコンテンツの後に */
     }
     .main {
         width: 100%;
+        order: 1; /* モバイルではコンテンツを先に */
     }
     .navi_menu {
         flex-wrap: wrap;
