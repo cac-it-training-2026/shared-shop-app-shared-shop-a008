@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.BasketItemBean;
 import jp.co.sss.shop.bean.OrderBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
@@ -184,22 +185,11 @@ public class ClientOrderShowController {
             return "redirect:/syserror";
         }
 
-        // 買い物かごリストをセッションから取得
-        @SuppressWarnings("unchecked")
-        List<BasketBean> sessionBasket = (List<BasketBean>) session.getAttribute("basketBeans");
+        // 買い物かご情報をセッションから取得
+        BasketBean sessionBasket = (BasketBean) session.getAttribute("basketBean");
 
-        // 作業用の買い物かごリストを生成（セッションのリストをコピー）
-        List<BasketBean> basket = new ArrayList<>();
-        if (sessionBasket != null) {
-            for (BasketBean bean : sessionBasket) {
-                BasketBean copy = new BasketBean();
-                copy.setId(bean.getId());
-                copy.setName(bean.getName());
-                copy.setStock(bean.getStock());
-                copy.setOrderNum(bean.getOrderNum());
-                basket.add(copy);
-            }
-        }
+        // 作業用の買い物かご情報を生成
+        BasketBean basket = (sessionBasket != null) ? sessionBasket.copy() : new BasketBean();
 
         // 注文商品を買い物かごへ追加
         for (OrderItem orderItem : order.getOrderItemsList()) {
@@ -216,31 +206,42 @@ public class ClientOrderShowController {
                 return showOrderDetail(id, model);
             }
 
-            // 同一商品の存在チェック
+            // 買い物かご内の既存商品チェックと数量加算制限のチェック
             boolean exist = false;
-            for (BasketBean basketBean : basket) {
-                if (basketBean.getId().equals(item.getId())) {
-                    // 数量を加算
-                    int newOrderNum = basketBean.getOrderNum() + orderItem.getQuantity();
-                    if (newOrderNum > item.getStock()) {
+            for (BasketItemBean bean : basket.getBasketItemBeanList()) {
+                if (bean.getId().equals(item.getId())) {
+                    if (bean.getOrderNum() + orderItem.getQuantity() > item.getStock()) {
                         model.addAttribute("error", messageSource.getMessage("msg.order.reorder.basket.stock.short", null, null));
                         return showOrderDetail(id, model);
                     }
-                    basketBean.setOrderNum(newOrderNum);
                     exist = true;
                     break;
                 }
             }
 
-            if (!exist) {
-                BasketBean basketBean = new BasketBean(item.getId(), item.getName(), item.getStock(),
-                        orderItem.getQuantity());
-                basket.add(basketBean);
-            }
+            // 買い物かごに追加
+            BasketItemBean itemBean = new BasketItemBean();
+            itemBean.setId(item.getId());
+            itemBean.setName(item.getName());
+            itemBean.setPrice(item.getPrice());
+            itemBean.setStock(item.getStock());
+            itemBean.setOrderNum(orderItem.getQuantity());
+
+            basket.add(itemBean);
         }
 
         // 全ての商品のチェックが完了したら、セッションに保存
-        session.setAttribute("basketBeans", basket);
+        session.setAttribute("basketBean", basket);
+
+        // 買い物かご内の合計点数と合計金額を計算し、セッションに保存する
+        int totalCount = 0;
+        int totalPrice = 0;
+        for (BasketItemBean bean : basket.getBasketItemBeanList()) {
+            totalCount += bean.getOrderNum();
+            totalPrice += bean.getPrice() * bean.getOrderNum();
+        }
+        session.setAttribute("basketTotalCount", totalCount);
+        session.setAttribute("basketTotalPrice", totalPrice);
 
         return "redirect:/client/basket/list";
     }

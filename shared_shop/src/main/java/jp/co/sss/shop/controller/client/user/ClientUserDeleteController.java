@@ -125,7 +125,7 @@ import jp.co.sss.shop.util.Constant;
 	    userRepository.save(user);
 	    
 	    // 買い物かご情報を削除
-	    session.removeAttribute("basketBeans");
+	    session.removeAttribute("basketBean");
 	    // カート合計情報を削除
 	    session.removeAttribute("basketTotalCount");
 	    session.removeAttribute("basketTotalPrice");

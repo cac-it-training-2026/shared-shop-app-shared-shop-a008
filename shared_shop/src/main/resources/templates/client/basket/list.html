@@ -24,12 +24,12 @@
 		<br />
 	</th:block>
 
-	<div th:if="${session.basketBeans == null}">
+	<div th:if="${session.basketBean == null}">
 		<!--/* 買い物かごが空のとき */-->
 		<p th:text="#{msg.basket.list.none}"></p>
 	</div>
 
-	<th:block th:if="${session.basketBeans != null}">
+	<th:block th:if="${session.basketBean != null}">
 		<table class="list_table basket">
 			<tr>
 				<th>[[#{data.basket.item.name}]]</th>
@@ -37,7 +37,7 @@
 				<th>[[#{data.basket.operate}]]</th>
 				<th>[[#{data.basket.stock.status}]]</th>
 			</tr>
-			<tr th:each="item, status: ${session.basketBeans}">
+			<tr th:each="item, status: ${session.basketBean.basketItemBeanList}">
 				<td><a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
 				<td th:text="${item.orderNum}"></td>
 				<td>

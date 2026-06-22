@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.BasketItemBean;
 import jp.co.sss.shop.bean.OrderItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
@@ -235,14 +236,14 @@ public class ClientOrderRegistController {
 		}
 
 		// セッションスコープから買い物かご情報を取得
-		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		BasketBean basket = (BasketBean) session.getAttribute("basketBean");
 		// セッションがnullの場合
 		if (basket == null) {
 			return "redirect:/login"; // ログイン画面にリダイレクト
 		}
 
 		// 元々のリストの要素数を保存しておく
-		int originalBasketSize = basket.size();
+		int originalBasketSize = basket.getBasketItemBeanList().size();
 
 		// 注文商品情報リストを生成
 		List<OrderItemBean> orderItemList = new ArrayList<>();
@@ -251,28 +252,28 @@ public class ClientOrderRegistController {
 		// 在庫が無い場合のリストを生成
 		List<String> itemNameListZero = new ArrayList<>();
 		// 商品削除用のリストを生成
-		List<BasketBean> removeList = new ArrayList<>();
+		List<BasketItemBean> removeList = new ArrayList<>();
 
 		// 在庫が0の商品をカウントする変数
 		int zeroCount = 0;
 
 		// 注文商品の最新情報をDBから取得し、商品の在庫チェックを行う
 		// 拡張for文で買い物かごリストの中身をチェック
-		for (BasketBean basketBean : basket) {
+		for (BasketItemBean basketItemBean : basket.getBasketItemBeanList()) {
 			// 該当商品のエンティティオブジェクトを生成
-			Item item = itemRepository.getReferenceById(basketBean.getId());
+			Item item = itemRepository.getReferenceById(basketItemBean.getId());
 			// 在庫が無い場合
 			if (item.getStock() == 0) {
 				zeroCount++; // カウントを増やす
 				// 在庫なしリストに追加
-				itemNameListZero.add(basketBean.getName());
+				itemNameListZero.add(basketItemBean.getName());
 				// 削除用リストに追加
-				removeList.add(basketBean);
-			} else if (item.getStock() < basketBean.getOrderNum()) { // 在庫数<注文数の場合
+				removeList.add(basketItemBean);
+			} else if (item.getStock() < basketItemBean.getOrderNum()) { // 在庫数<注文数の場合
 				// 注文数を現在の在庫数に変更
-				basketBean.setOrderNum(item.getStock());
+				basketItemBean.setOrderNum(item.getStock());
 				// 在庫不足のリストに追加
-				itemNameListLessThan.add(basketBean.getName());
+				itemNameListLessThan.add(basketItemBean.getName());
 				// 在庫不足リストをリクエストスコープに保存
 				model.addAttribute("itemNameListLessThan", itemNameListLessThan);
 			}
@@ -281,14 +282,14 @@ public class ClientOrderRegistController {
 		// 全部在庫が無い場合
 		if (zeroCount == originalBasketSize) {
 			// セッションから買い物かごを削除
-			session.removeAttribute("basketBeans");
+			session.removeAttribute("basketBean");
 			// 在庫なしリストに追加
 			model.addAttribute("itemNameListZero", itemNameListZero);
 		} else if (zeroCount > 0) {
 			// 在庫切れの商品をかごから削除
-			basket.removeAll(removeList);
+			basket.getBasketItemBeanList().removeAll(removeList);
 			// 削除後の買い物かごをセッションに保存
-			session.setAttribute("basketBeans", basket);
+			session.setAttribute("basketBean", basket);
 			// 在庫なしリストをリクエストスコープに保存
 			model.addAttribute("itemNameListZero", itemNameListZero);
 		}
@@ -300,12 +301,12 @@ public class ClientOrderRegistController {
 
 		// 買い物かご情報から、商品ごとの金額小計を算出し、注文商品情報リストに保存
 		// 拡張for文で買い物かごリストの中身をチェック
-		for (BasketBean basketBean : basket) {
+		for (BasketItemBean basketItemBean : basket.getBasketItemBeanList()) {
 			// 該当商品のエンティティオブジェクトを生成
-			Item item = itemRepository.getReferenceById(basketBean.getId());
+			Item item = itemRepository.getReferenceById(basketItemBean.getId());
 
 			// 商品単価x注文数 で 小計を計算
-			subTotal = item.getPrice() * basketBean.getOrderNum();
+			subTotal = item.getPrice() * basketItemBean.getOrderNum();
 
 			// 注文商品のBeanオブジェクトを生成
 			OrderItemBean orderItemBean = new OrderItemBean();
@@ -314,7 +315,7 @@ public class ClientOrderRegistController {
 			orderItemBean.setName(item.getName());
 			orderItemBean.setPrice(item.getPrice());
 			orderItemBean.setImage(item.getImage());
-			orderItemBean.setOrderNum(basketBean.getOrderNum());
+			orderItemBean.setOrderNum(basketItemBean.getOrderNum());
 			orderItemBean.setSubtotal(subTotal);
 
 			// 注文商品情報リストに追加
@@ -348,7 +349,7 @@ public class ClientOrderRegistController {
 	@RequestMapping(path = "/client/order/complete", method = RequestMethod.POST)
 	public String orderCompletePost(Model model) {
 		// セッションスコープから買い物かご情報を取得
-		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+		BasketBean basket = (BasketBean) session.getAttribute("basketBean");
 		// セッションがnullの場合
 		if (basket == null) {
 			return "redirect:/login"; // ログイン画面にリダイレクト
@@ -389,29 +390,29 @@ public class ClientOrderRegistController {
 		// 在庫が無い場合のリストを生成
 		List<String> itemNameListZero = new ArrayList<>();
 		// 商品削除用のリストを生成
-		List<BasketBean> removeList = new ArrayList<>();
+		List<BasketItemBean> removeList = new ArrayList<>();
 
 		// 在庫が0の商品をカウントする変数
 		int zeroCount = 0;
 
 		// 注文商品の在庫チェックをする
 		// 拡張for文で買い物かごリストの中身をチェック
-		for (BasketBean basketBean : basket) {
+		for (BasketItemBean basketItemBean : basket.getBasketItemBeanList()) {
 			// 該当商品のエンティティオブジェクトを生成
-			Item item = itemRepository.getReferenceById(basketBean.getId());
+			Item item = itemRepository.getReferenceById(basketItemBean.getId());
 			// 在庫が無い場合
 			if (item.getStock() == 0) {
 				// カウントを増やす
 				zeroCount++;
 				// 在庫なしリストに追加
-				itemNameListZero.add(basketBean.getName());
+				itemNameListZero.add(basketItemBean.getName());
 				// 削除用リストに追加
-				removeList.add(basketBean);
-			} else if (item.getStock() < basketBean.getOrderNum()) { // 在庫数<注文数の場合
+				removeList.add(basketItemBean);
+			} else if (item.getStock() < basketItemBean.getOrderNum()) { // 在庫数<注文数の場合
 				// 注文数を現在の在庫数に変更
-				basketBean.setOrderNum(item.getStock());
+				basketItemBean.setOrderNum(item.getStock());
 				// 在庫不足のリストに追加
-				itemNameListLessThan.add(basketBean.getName());
+				itemNameListLessThan.add(basketItemBean.getName());
 				// 在庫不足リストをリクエストスコープに保存
 				model.addAttribute("itemNameListLessThan", itemNameListLessThan);
 				// 注文確認画面にリダイレクト
@@ -420,17 +421,17 @@ public class ClientOrderRegistController {
 		}
 
 		// 全部在庫が無い場合
-		if (zeroCount == basket.size()) {
+		if (zeroCount == basket.getBasketItemBeanList().size()) {
 			// セッションから買い物かごを削除
-			session.removeAttribute("basketBeans");
+			session.removeAttribute("basketBean");
 			// 在庫なしリストに追加
 			model.addAttribute("itemNameListZero", itemNameListZero);
 			return "redirect:/client/order/check";
 		} else if (zeroCount > 0) {
 			// 在庫切れの商品をかごから削除
-			basket.removeAll(removeList);
+			basket.getBasketItemBeanList().removeAll(removeList);
 			// 削除後の買い物かごをセッションに保存
-			session.setAttribute("basketBeans", basket);
+			session.setAttribute("basketBean", basket);
 			// 在庫なしリストに追加
 			model.addAttribute("itemNameListZero", itemNameListZero);
 			// 注文確認画面にリダイレクト
@@ -454,13 +455,13 @@ public class ClientOrderRegistController {
 		order = orderRepository.save(order);
 
 		// 拡張for文で買い物かごリストの中身をチェック
-		for (BasketBean basketBean : basket) {
+		for (BasketItemBean basketItemBean : basket.getBasketItemBeanList()) {
 			// 買い物かごの商品を主キー検索
-			Item item = itemRepository.getReferenceById(basketBean.getId());
+			Item item = itemRepository.getReferenceById(basketItemBean.getId());
 			// OrderItemエンティティのオブジェクトを生成
 			OrderItem orderItem = new OrderItem();
 			// 注文個数をセット
-			orderItem.setQuantity(basketBean.getOrderNum());
+			orderItem.setQuantity(basketItemBean.getOrderNum());
 			// 注文情報をセット
 			orderItem.setOrder(order);
 			// 商品情報をセット
@@ -471,13 +472,13 @@ public class ClientOrderRegistController {
 			orderItem = orderItemRepository.save(orderItem);
 
 			// 注文商品の在庫数を減らす
-			item.setStock(item.getStock() - basketBean.getOrderNum());
+			item.setStock(item.getStock() - basketItemBean.getOrderNum());
 			// レコードの登録
 			itemRepository.save(item);
 		}
 
 		// 買い物かご情報を削除
-		session.removeAttribute("basketBeans");
+		session.removeAttribute("basketBean");
 		// カート合計情報を削除
 		session.removeAttribute("basketTotalCount");
 		session.removeAttribute("basketTotalPrice");

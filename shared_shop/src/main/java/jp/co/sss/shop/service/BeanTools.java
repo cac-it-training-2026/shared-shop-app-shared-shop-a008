@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.BasketItemBean;
 import jp.co.sss.shop.bean.CategoryBean;
 import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.bean.OrderBean;
@@ -183,14 +184,14 @@ public class BeanTools {
 	/**
 	 * 商品情報と買い物かご商品情報から、注文商品情報を生成する
 	 * @param item 商品情報
-	 * @param basketBean 買い物かご商品情報
+	 * @param basketItemBean 買い物かご商品情報
 	 * @return　注文商品情報
 	 */
-	public OrderItemBean generateOrderItemBean(Item item, BasketBean basketBean) {
+	public OrderItemBean generateOrderItemBean(Item item, BasketItemBean basketItemBean) {
 		// オーダー商品情報の作成とリスト追加
 		OrderItemBean orderItemBean = new OrderItemBean();
 		BeanUtils.copyProperties(item, orderItemBean);
-		orderItemBean.setOrderNum(basketBean.getOrderNum());
+		orderItemBean.setOrderNum(basketItemBean.getOrderNum());
 		int subtotal = orderItemBean.getPrice() * orderItemBean.getOrderNum();
 		orderItemBean.setSubtotal(subtotal);
 

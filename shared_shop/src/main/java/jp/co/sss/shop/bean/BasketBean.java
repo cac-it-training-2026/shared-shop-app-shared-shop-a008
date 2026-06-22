@@ -1,129 +1,92 @@
 package jp.co.sss.shop.bean;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 買い物かご内の商品情報クラス
- *
- * @author SystemShared
+ * 買い物かご全体の情報を保持するクラス
  */
-
-public class BasketBean {
-
-	/**
-	 * 商品ID
-	 */
-	private Integer id;
+public class BasketBean implements Serializable {
 
 	/**
-	 * 商品名
+	 * 商品リスト
 	 */
-	private String name;
+	private List<BasketItemBean> basketItemBeanList = new ArrayList<>();
 
 	/**
-	 * 商品在庫数
+	 * 商品リストの取得
+	 * @return 商品リスト
 	 */
-	private Integer stock;
-
-	/**
-	 * 商品注文個数 初期値 1
-	 */
-	private Integer orderNum = 1;
-
-	/**
-	 * コンストラクタ
-	 */
-	public BasketBean() {
+	public List<BasketItemBean> getBasketItemBeanList() {
+		return basketItemBeanList;
 	}
 
 	/**
-	 * コンストラクタ
+	 * 商品リストのセット
+	 * @param basketItemBeanList 商品リスト
+	 */
+	public void setBasketItemBeanList(List<BasketItemBean> basketItemBeanList) {
+		this.basketItemBeanList = basketItemBeanList;
+	}
+
+	/**
+	 * 指定した商品IDを持つ商品の注文数を追加する。
+	 * 同一商品がリストにある場合は加算し、ない場合は新規追加する。
 	 * 
-	 * @param id  商品ID
-	 * @param name  商品名
-	 * @param stock 商品在庫数
+	 * @param itemBean 追加する商品情報
 	 */
-	public BasketBean(Integer id, String name, Integer stock) {
-		this.id = id;
-		this.name = name;
-		this.stock = stock;
+	public void add(BasketItemBean itemBean) {
+		boolean exist = false;
+		for (BasketItemBean bean : basketItemBeanList) {
+			if (bean.getId().equals(itemBean.getId())) {
+				bean.setOrderNum(bean.getOrderNum() + itemBean.getOrderNum());
+				exist = true;
+				break;
+			}
+		}
+		if (!exist) {
+			basketItemBeanList.add(itemBean);
+		}
 	}
 
 	/**
-	 * コンストラクタ
-	 * 
-	 * @param id  商品ID
-	 * @param name  商品名
-	 * @param stock  商品在庫数
-	 * @param orderNum  注文個数
+	 * 指定した商品IDを持つ商品の注文数を減らす（または削除する）。
+	 *
+	 * @param id 削除する商品ID
 	 */
-	public BasketBean(Integer id, String name, Integer stock, Integer orderNum) {
-		this.id = id;
-		this.name = name;
-		this.stock = stock;
-		this.orderNum = orderNum;
+	public void delete(Integer id) {
+		for (int i = 0; i < basketItemBeanList.size(); i++) {
+			BasketItemBean bean = basketItemBeanList.get(i);
+			if (bean.getId().equals(id)) {
+				if (bean.getOrderNum() > 1) {
+					bean.setOrderNum(bean.getOrderNum() - 1);
+				} else {
+					basketItemBeanList.remove(i);
+				}
+				break;
+			}
+		}
 	}
 
 	/**
-	 * 商品IDの取得
-	 * @return 商品ID
+	 * 買い物かごを空にする。
 	 */
-	public Integer getId() {
-		return id;
+	public void allDelete() {
+		basketItemBeanList.clear();
 	}
 
 	/**
-	 * 商品IDのセット
-	 * @param id 商品ID
+	 * 自身を複製する。
+	 * @return 複製されたオブジェクト
 	 */
-	public void setId(Integer id) {
-		this.id = id;
+	public BasketBean copy() {
+		BasketBean newBean = new BasketBean();
+		List<BasketItemBean> newList = new ArrayList<>();
+		for (BasketItemBean item : this.basketItemBeanList) {
+			newList.add(item.copy());
+		}
+		newBean.setBasketItemBeanList(newList);
+		return newBean;
 	}
-
-	/**
-	 * 商品名の取得
-	 * @return 商品名
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * 商品名のセット
-	 * @param name 商品名
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * 商品の在庫数の取得
-	 * @return 在庫数
-	 */
-	public Integer getStock() {
-		return stock;
-	}
-
-	/**
-	 * 商品の在庫数のセット
-	 * @param stock 在庫数
-	 */
-	public void setStock(Integer stock) {
-		this.stock = stock;
-	}
-
-	/**
-	 * 買い物かごに入れている商品個数の取得
-	 * @return 注文個数
-	 */
-	public Integer getOrderNum() {
-		return orderNum;
-	}
-
-	/**
-	 * 買い物かごに入れる商品個数のセット
-	 * @param orderNum 注文個数
-	 */
-	public void setOrderNum(Integer orderNum) {
-		this.orderNum = orderNum;
-	}
-
 }
