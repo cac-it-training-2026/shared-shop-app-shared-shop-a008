@@ -53,6 +53,15 @@ public class AuthorizationFilter extends HttpFilter {
             }
         }
 
+        // 顧客画面（会員情報・注文情報）アクセス制御
+        if (path.startsWith("/client/user/") || path.startsWith("/client/order/")) {
+            if (user == null) {
+                // 未ログイン時はログイン画面へ
+                response.sendRedirect(contextPath + "/login");
+                return;
+            }
+        }
+
         // 一般ユーザーの本人確認制御
         if (user != null && "USER".equals(user.getRole())) {
             // 会員情報アクセス制御
