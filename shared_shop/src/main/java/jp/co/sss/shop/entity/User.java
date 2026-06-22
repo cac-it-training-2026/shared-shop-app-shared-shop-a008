@@ -73,7 +73,7 @@ public class User {
 	 * 権限(文字列)
 	 */
 	@Column
-	private String role;
+	private String role = "USER";
 
 	/**
 	 * 削除フラグ 0:未削除、1:削除済み
@@ -85,7 +85,7 @@ public class User {
 	 * 所持ポイント
 	 */
 	@Column
-	private Integer point;
+	private Integer point = 0;
 
 	/**
 	 * 登録日付
