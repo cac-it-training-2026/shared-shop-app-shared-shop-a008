@@ -84,7 +84,7 @@ public class AuthorizationFilter extends HttpFilter {
                     Integer orderId = Integer.parseInt(parts[parts.length - 1]);
                     Order order = orderRepository.findById(orderId).orElse(null);
                     if (order != null && !order.getUser().getId().equals(user.getId())) {
-                        response.sendRedirect(contextPath + "/403");
+                        response.sendRedirect(contextPath + "/login");
                         return;
                     }
                 } catch (NumberFormatException e) {
