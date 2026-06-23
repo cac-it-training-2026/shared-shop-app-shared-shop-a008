@@ -77,6 +77,25 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	List<Item> findHotSellItemsByCategory(@Param("categoryId") Integer categoryId, @Param("deleteFlag") int deleteFlag);
 
 	/**
+	 * カテゴリ検索状態の売れ筋順（注文数量合計が多い順）の商品一覧
+	 * @param categoryId カテゴリID
+	 * @param deleteFlag 削除フラグ
+	 * @param pageable ページング情報
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag AND i.category.id = :categoryId GROUP BY i ORDER BY COALESCE(SUM(oi.quantity), 0) DESC, i.id DESC")
+	List<Item> findHotSellItemsByCategoryId(@Param("categoryId") Integer categoryId, @Param("deleteFlag") int deleteFlag, Pageable pageable);
+
+	/**
+	 * 売れ筋順（注文数量合計が多い順）の商品一覧
+	 * @param deleteFlag 削除フラグ
+	 * @param pageable ページング情報
+	 * @return 商品エンティティのリスト
+	 */
+	@Query("SELECT i FROM Item i LEFT JOIN i.orderItemList oi WHERE i.deleteFlag = :deleteFlag GROUP BY i ORDER BY COALESCE(SUM(oi.quantity), 0) DESC, i.id DESC")
+	List<Item> findAllHotSellItems(@Param("deleteFlag") int deleteFlag, Pageable pageable);
+
+	/**
 	 * 売れ筋順（注文回数が多い順）、内部結合で注文情報がある商品のみ参照
 	 * @param deleteFlag 削除フラグ
 	 * @return 商品エンティティのリスト
