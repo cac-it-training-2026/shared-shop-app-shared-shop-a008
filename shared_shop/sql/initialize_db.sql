@@ -1,31 +1,21 @@
 /*初期化文*/
 -- 1. 注文商品テーブル（注文と商品に依存）の削除
 DROP TABLE order_items CASCADE CONSTRAINTS;
-
 -- 2. 注文テーブル（会員に依存）の削除
 DROP TABLE orders CASCADE CONSTRAINTS;
-
 -- 3. 会員テーブルの削除
 DROP TABLE users CASCADE CONSTRAINTS;
-
 -- 4. 商品テーブル（カテゴリに依存）の削除
 DROP TABLE items CASCADE CONSTRAINTS;
-
 -- 5. カテゴリテーブルの削除
 DROP TABLE categories CASCADE CONSTRAINTS;
-
-
 -- シーケンスの削除
 DROP SEQUENCE seq_order_items;
 DROP SEQUENCE seq_orders;
 DROP SEQUENCE seq_users;
 DROP SEQUENCE seq_items;
 DROP SEQUENCE seq_categories;
-
 PURGE RECYCLEBIN;
-
-
-
 
 -- カテゴリテーブルの作成
 CREATE TABLE categories (
@@ -60,7 +50,7 @@ CREATE TABLE users (
   address VARCHAR2(150 CHAR) NOT NULL,
   phone_number VARCHAR2(11) NOT NULL,
   authority NUMBER(1) NOT NULL,
-  role VARCHAR2(10 CHAR) NOT NULL, -- 追加: 権限(文字列)
+  role VARCHAR2(10 CHAR) DEFAULT 'USER' NOT NULL, -- 修正: 新規登録時はDEFAULTでUSERを自動設定
   point NUMBER(6) DEFAULT 0 NOT NULL, -- 追加: 所持ポイント
   login_failure_count NUMBER(2) DEFAULT 0 NOT NULL, -- 追加: ログイン失敗回数
   lock_datetime TIMESTAMP, -- 追加: ロック解除時刻
@@ -92,16 +82,12 @@ CREATE TABLE order_items (
 
 -- シーケンスの作成(カテゴリテーブル用)
 CREATE SEQUENCE seq_categories NOCACHE;
-
 -- シーケンスの作成(商品テーブル用)
 CREATE SEQUENCE seq_items NOCACHE;
-
 -- シーケンスの作成(会員テーブル用)
 CREATE SEQUENCE seq_users NOCACHE;
-
 -- シーケンスの作成(注文テーブル用)
 CREATE SEQUENCE seq_orders NOCACHE;
-
 -- シーケンスの作成(注文商品テーブル用)
 CREATE SEQUENCE seq_order_items NOCACHE;
 
@@ -110,9 +96,16 @@ INSERT INTO categories VALUES(seq_categories.NEXTVAL, '食料品', '野菜類、
 INSERT INTO categories VALUES(seq_categories.NEXTVAL, '書籍', '和書、洋書、専門書、漫画、雑誌などを扱います。', DEFAULT, DEFAULT);
 
 -- レコード登録(商品)
-INSERT INTO items VALUES(seq_items.NEXTVAL, 'りんご', 100, '青森県産のりんごです。とってもみずみずしい！', 30, 'apple.jpg', 1, DEFAULT, DEFAULT);
-INSERT INTO items VALUES(seq_items.NEXTVAL, '辞書', 2000, 'これ一冊があれば大丈夫！', 5, 'dictionary.jpg', 2, DEFAULT, DEFAULT);
-INSERT INTO items VALUES(seq_items.NEXTVAL, 'オレンジ', 150, 'オーストラリア産のオレンジです。', 30, NULL, 1, DEFAULT, DEFAULT);
+-- 在庫数が0個、画像データが登録
+INSERT INTO items VALUES(seq_items.NEXTVAL, 'りんご', 'リンゴ', 100, '青森県産のりんごです。とってもみずみずしい！', 30, 'apple.jpg', 1, DEFAULT, DEFAULT);
+-- 在庫数が1個、画像データが登録
+INSERT INTO items VALUES(seq_items.NEXTVAL, '辞書', 'ジショ', 2000, 'これ一冊があれば大丈夫！', 1, 'dictionary.jpg', 2, DEFAULT, DEFAULT);
+-- 在庫数が5個、画像データが未登録
+INSERT INTO items VALUES(seq_items.NEXTVAL, 'オレンジ', 'オレンジ', 150, 'オーストラリア産のオレンジです。', 5, NULL, 1, DEFAULT, DEFAULT);
+-- 在庫数が6個、画像データが未登録
+INSERT INTO items VALUES(seq_items.NEXTVAL, 'スイカ', 'スイカ', 300, '熊本県産のスイカです。甘く美味しい！', 6, NULL, 1, DEFAULT, DEFAULT);
+-- 在庫数が9999個、画像データが未登録
+INSERT INTO items VALUES(seq_items.NEXTVAL, 'もっちゅりん', 'モッチュリン', 230, '今までにないもっちゅり食感のドーナツ！', 9999, NULL, 1, DEFAULT, DEFAULT);
 
 -- レコード登録(会員)
 INSERT INTO users VALUES(seq_users.NEXTVAL, 'tanaka_taro@test.co.jp', 'Testtest0', 'システム管理太郎', '1111111', '東京都台東区1-2-3 ABCビル10階', '0123456789', 0, 'ADMIN', DEFAULT, DEFAULT, NULL, 0, DEFAULT);
