@@ -6,14 +6,20 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.shop.bean.BasketBean;
+import jp.co.sss.shop.bean.ItemBean;
 import jp.co.sss.shop.bean.UserBean;
 import jp.co.sss.shop.entity.Item;
+import jp.co.sss.shop.form.BasketForm;
 import jp.co.sss.shop.repository.ItemRepository;
+import jp.co.sss.shop.service.BeanTools;
+import jp.co.sss.shop.util.Constant;
 
 /**
  * 買い物かごの基本クラス
@@ -30,6 +36,12 @@ public class ClientBasketController {
 	/** セッションオブジェクト生成 */
 	@Autowired
 	HttpSession session;
+
+	/**
+	 * Entity、Form、Bean間のデータコピーサービス
+	 */
+	@Autowired
+	BeanTools beanTools;
 
 	/**
 	 * 買い物かご内の商品一覧を表示するメソッド
@@ -112,12 +124,28 @@ public class ClientBasketController {
 	/**
 	 * 買い物かごに商品追加をするメソッド
 	 * 
-	 * @param session セッション情報
-	 * @param id 追加する商品ID
+	 * @param form 買い物かご用フォーム
+	 * @param result バリデーション結果
+	 * @param model Viewとの値受渡し
 	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 * @return "client/item/detail" 詳細画面 表示（バリデーションエラー時）
 	 */
 	@RequestMapping(path = "/client/basket/add", method = RequestMethod.POST)
-	public String basketAdd(Integer id) {
+	public String basketAdd(@Valid BasketForm form, BindingResult result, Model model) {
+		// 商品IDの取得
+		Integer id = form.getId();
+
+		// 商品情報の取得
+		Item item = itemRepository.findByIdAndDeleteFlag(id, Constant.NOT_DELETED);
+
+		if (result.hasErrors()) {
+			// Itemエンティティの各フィールドの値をItemBeanにコピー
+			ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+			// 商品情報をViewへ渡す
+			model.addAttribute("item", itemBean);
+			return "client/item/detail";
+		}
+
 		// 買い物かごリストを取得
 		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
 
@@ -127,17 +155,24 @@ public class ClientBasketController {
 			basket = new ArrayList<BasketBean>();
 		}
 
-		// getReferenceById(id)で主キー検索
-		Item item = itemRepository.getReferenceById(id);
-
 		// 同一商品が存在するかのフラグ
 		boolean exist = false;
 
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean existBasketBeans : basket) {
 			// 既存買い物かごの商品IDと、選択商品IDが同じ場合
-			if (existBasketBeans.getId() == item.getId()) {
-				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + 1);
+			if (existBasketBeans.getId().equals(item.getId())) {
+				// 在庫チェック
+				if (existBasketBeans.getOrderNum() + form.getQuantity() > item.getStock()) {
+					// 在庫不足エラー
+					model.addAttribute("stockError", "※" + item.getName() + "は、在庫不足のため、数を増やすことができません。");
+					// Itemエンティティの各フィールドの値をItemBeanにコピー
+					ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+					// 商品情報をViewへ渡す
+					model.addAttribute("item", itemBean);
+					return "client/item/detail";
+				}
+				existBasketBeans.setOrderNum(existBasketBeans.getOrderNum() + form.getQuantity());
 
 				// フラグをtrueに設定
 				exist = true;
@@ -147,12 +182,24 @@ public class ClientBasketController {
 		}
 		// 買い物かごに同一商品が存在しない場合
 		if (!exist) {
+			// 在庫チェック
+			if (form.getQuantity() > item.getStock()) {
+				// 在庫不足エラー
+				model.addAttribute("stockError", "※" + item.getName() + "は、在庫不足のため、数を増やすことができません。");
+				// Itemエンティティの各フィールドの値をItemBeanにコピー
+				ItemBean itemBean = beanTools.copyEntityToItemBean(item);
+				// 商品情報をViewへ渡す
+				model.addAttribute("item", itemBean);
+				return "client/item/detail";
+			}
+
 			// BasketBeanオブジェクトを生成
 			BasketBean basketBean = new BasketBean();
 			// 商品ID, 商品名, 在庫数をBeanにコピー
 			basketBean.setId(item.getId());
 			basketBean.setName(item.getName());
 			basketBean.setStock(item.getStock());
+			basketBean.setOrderNum(form.getQuantity());
 			// 買い物かごリストに追加
 			basket.add(basketBean);
 		}
