@@ -372,6 +372,9 @@ li.error_msg  {
 .shopping_button button {
 	min-width: 200px;
 	text-align: center;
+	padding: 12px 20px;
+	height: auto;
+	box-sizing: border-box;
 }
 
 .detail_button_area {
@@ -391,8 +394,11 @@ li.error_msg  {
 	text-align: right;
 }
 .detail_button_area [type="submit"]{
-	/* padding: 0.6em 1.8em; */
-	font-size: 1.2em;
+	min-width: 200px;
+	padding: 12px 20px;
+	height: auto;
+	box-sizing: border-box;
+	font-size: 1.1em;
 }
 .card_info {
 	padding-top: 10px;
@@ -887,8 +893,8 @@ p.link_center {
 
 .diagnosis_result_title {
 	margin-top: 30px;
-	color: #12526d;
-	border-bottom: 2px solid #add8e6;
+	color: var(--mint-dark);
+	border-bottom: 2px solid var(--mint-accent);
 	padding-bottom: 5px;
 }
 
