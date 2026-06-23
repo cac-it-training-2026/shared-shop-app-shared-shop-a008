@@ -210,6 +210,47 @@ public class ClientBasketController {
 	}
 
 	/**
+	 * 買い物かごの選択商品を削除するメソッド
+	 *
+	 * @param ids 削除する商品のID配列
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 */
+	@RequestMapping(path = "/client/basket/selectedDelete", method = RequestMethod.POST)
+	public String basketSelectedDelete(Integer[] ids) {
+		if (ids != null && ids.length > 0) {
+			// 買い物かごリストを取得
+			List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+			if (basket != null) {
+				List<BasketBean> removeList = new ArrayList<>();
+				for (Integer id : ids) {
+					for (BasketBean basketBean : basket) {
+						if (basketBean.getId().equals(id)) {
+							removeList.add(basketBean);
+							break;
+						}
+					}
+				}
+				basket.removeAll(removeList);
+
+				// かごの中身が何もない場合
+				if (basket.isEmpty()) {
+					// セッションの削除
+					session.removeAttribute("basketBeans");
+				} else { // かごに他の商品がある場合
+					// 該当商品削除後の買い物かごを、セッションに保存
+					session.setAttribute("basketBeans", basket);
+				}
+			}
+		}
+
+		updateBasketSummary(session);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
 	 * 買い物かごの商品を全削除するメソッド
 	 * 
 	 * @param session セッション情報
