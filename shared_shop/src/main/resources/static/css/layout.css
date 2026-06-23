@@ -208,17 +208,17 @@ aside.admin_menu {
 	border-radius: 6px 6px 0 0;
 	text-align: center;
 	font-size: 1.1em;
-	background: #fff;
-	color: #333;
-	border: 1px solid #e0e0e0;
+	background: #333;
+	color: #fff;
+	border: 1px solid #333;
 }
 .search_area .title{
 	border-radius: 6px 6px 6px 6px;
 	text-align: center;
 	font-size: 1.1em;
-	background: #fff;
-	color: #333;
-	border: 1px solid #e0e0e0;
+	background: #333;
+	color: #fff;
+	border: 1px solid #333;
 }
 
 .admin_menu .title {

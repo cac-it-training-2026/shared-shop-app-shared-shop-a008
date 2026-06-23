@@ -86,10 +86,10 @@
 			</tr>
 		</table>
 		<form th:action="@{/client/order/complete}" method="post">
-			<input class="send_button" type="submit" value="ご注文の確定" th:if="${orderItemBeans != null}"/>
-		</form>
-		<form th:action="@{/client/order/payment/back}" method="post" class="update">
-			<input type="submit" value="戻る" class="back_button" />
+			<div class="shopping_button">
+				<button type="button" class="back_button" onclick="window.history.back();">戻る</button>
+				<input class="send_button" type="submit" value="ご注文の確定" th:if="${orderItemBeans != null}"/>
+			</div>
 		</form>
 	</div>
 	</th:block>

@@ -35,11 +35,11 @@
 		</table>
 
 		<div class="detail_button_area">
-			<form th:action="@{/client/order/cancel/{id}(id=${order.id})}" method="post" style="display: inline;">
-				<input type="submit" value="キャンセル確定" class="delete_button" />
-			</form>
 			<form th:action="@{/client/order/detail/{id}(id=${order.id})}" method="get" style="display: inline;">
 				<input type="submit" value="戻る" class="back_button" />
+			</form>
+			<form th:action="@{/client/order/cancel/{id}(id=${order.id})}" method="post" style="display: inline;">
+				<input type="submit" value="キャンセル確定" class="delete_button" />
 			</form>
 		</div>
 	</div>
