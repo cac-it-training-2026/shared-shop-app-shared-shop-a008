@@ -195,16 +195,57 @@ public class ClientBasketController {
 
 			// BasketBeanオブジェクトを生成
 			BasketBean basketBean = new BasketBean();
-			// 商品ID, 商品名, 在庫数をBeanにコピー
+			// 商品ID, 商品名, 在庫数, 単価をBeanにコピー
 			basketBean.setId(item.getId());
 			basketBean.setName(item.getName());
 			basketBean.setStock(item.getStock());
+			basketBean.setPrice(item.getPrice());
 			basketBean.setOrderNum(form.getQuantity());
 			// 買い物かごリストに追加
 			basket.add(basketBean);
 		}
 
 		// セッションスコープに保存
+		session.setAttribute("basketBeans", basket);
+
+		updateBasketSummary(session);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
+	 * 買い物かごの商品の数量を直接更新するメソッド
+	 *
+	 * @param id 更新する商品のID
+	 * @param orderNum 新しい注文数
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 */
+	@RequestMapping(path = "/client/basket/update", method = RequestMethod.POST)
+	public String basketUpdate(Integer id, Integer orderNum) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean basketBean : basket) {
+			// 更新対象の商品IDと一致する場合
+			if (basketBean.getId().equals(id)) {
+				// 商品情報を取得
+				Item item = itemRepository.getReferenceById(id);
+
+				// 数量の補正（nullまたは1未満は1、在庫数超えは在庫数）
+				int newOrderNum = (orderNum == null || orderNum < 1) ? 1 : orderNum;
+				if (newOrderNum > item.getStock()) {
+					newOrderNum = item.getStock();
+				}
+
+				// 注文数を更新
+				basketBean.setOrderNum(newOrderNum);
+				break;
+			}
+		}
+
+		// 買い物かごをセッションに保存
 		session.setAttribute("basketBeans", basket);
 
 		updateBasketSummary(session);
@@ -266,6 +307,74 @@ public class ClientBasketController {
 	public String basketAllDelete() {
 		// セッションの破棄
 		session.removeAttribute("basketBeans");
+
+		updateBasketSummary(session);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
+	 * 買い物かごの商品の数量を増やすメソッド
+	 *
+	 * @param id 増加する商品のID
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 */
+	@RequestMapping(path = "/client/basket/increment", method = RequestMethod.POST)
+	public String basketIncrement(Integer id) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean basketBean : basket) {
+			// 増加対象の商品IDと一致する場合
+			if (basketBean.getId().equals(id)) {
+				// 商品情報を取得
+				Item item = itemRepository.getReferenceById(id);
+				// 在庫チェック
+				if (basketBean.getOrderNum() < item.getStock()) {
+					// 注文数を1増やす
+					basketBean.setOrderNum(basketBean.getOrderNum() + 1);
+				}
+				break;
+			}
+		}
+
+		// 買い物かごをセッションに保存
+		session.setAttribute("basketBeans", basket);
+
+		updateBasketSummary(session);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
+	 * 買い物かごの商品の数量を減らすメソッド
+	 *
+	 * @param id 減少する商品のID
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 */
+	@RequestMapping(path = "/client/basket/decrement", method = RequestMethod.POST)
+	public String basketDecrement(Integer id) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean basketBean : basket) {
+			// 減少対象の商品IDと一致する場合
+			if (basketBean.getId().equals(id)) {
+				// 数量チェック（1より大きい場合のみ減らす）
+				if (basketBean.getOrderNum() > 1) {
+					// 注文数を1減らす
+					basketBean.setOrderNum(basketBean.getOrderNum() - 1);
+				}
+				break;
+			}
+		}
+
+		// 買い物かごをセッションに保存
+		session.setAttribute("basketBeans", basket);
 
 		updateBasketSummary(session);
 

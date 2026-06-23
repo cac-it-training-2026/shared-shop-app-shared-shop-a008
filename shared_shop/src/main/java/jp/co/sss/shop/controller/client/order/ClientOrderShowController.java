@@ -196,6 +196,7 @@ public class ClientOrderShowController {
                 copy.setId(bean.getId());
                 copy.setName(bean.getName());
                 copy.setStock(bean.getStock());
+                copy.setPrice(bean.getPrice());
                 copy.setOrderNum(bean.getOrderNum());
                 basket.add(copy);
             }
@@ -234,7 +235,7 @@ public class ClientOrderShowController {
 
             if (!exist) {
                 BasketBean basketBean = new BasketBean(item.getId(), item.getName(), item.getStock(),
-                        orderItem.getQuantity());
+                        item.getPrice(), orderItem.getQuantity());
                 basket.add(basketBean);
             }
         }

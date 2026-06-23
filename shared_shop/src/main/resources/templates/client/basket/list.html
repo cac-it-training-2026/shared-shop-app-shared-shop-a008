@@ -33,13 +33,34 @@
 		<table class="list_table basket">
 			<tr>
 				<th>[[#{data.basket.item.name}]]</th>
+				<th>[[#{data.unit.price}]]</th>
 				<th>[[#{data.basket.count}]]</th>
+				<th>[[#{data.subtotal}]]</th>
 				<th>[[#{data.basket.operate}]]</th>
 				<th>[[#{data.basket.stock.status}]]</th>
 			</tr>
 			<tr th:each="item, status: ${session.basketBeans}">
 				<td><a th:href="@{/client/item/detail/{id}(id=${item.id})}" th:text="${item.name}"></a></td>
-				<td th:text="${item.orderNum}"></td>
+				<td th:text="${#numbers.formatInteger(item.price, 1, 'COMMA')}"></td>
+				<td>
+					<div class="quantity_control">
+						<form th:action="@{/client/basket/decrement}" method="post" style="display: inline;">
+							<input type="hidden" name="id" th:value="${item.id}" />
+							<input type="submit" value="－" class="quantity_button" th:disabled="${item.orderNum <= 1}" />
+						</form>
+
+						<form th:action="@{/client/basket/update}" method="post" style="display: inline;">
+							<input type="hidden" name="id" th:value="${item.id}" />
+							<input type="number" name="orderNum" th:value="${item.orderNum}" min="1" th:max="${item.stock}" class="quantity_input" onblur="if(this.value < 1) this.value = 1; this.form.submit();" />
+						</form>
+
+						<form th:action="@{/client/basket/increment}" method="post" style="display: inline;">
+							<input type="hidden" name="id" th:value="${item.id}" />
+							<input type="submit" value="＋" class="quantity_button" th:disabled="${item.orderNum >= item.stock}" />
+						</form>
+					</div>
+				</td>
+				<td th:text="${#numbers.formatInteger(item.price * item.orderNum, 1, 'COMMA')}"></td>
 				<td>
 					<form th:action="@{/client/basket/delete}" method="post">
 						<input type="hidden" name="id" th:value="${item.id}" /> <input type="submit" value="削除"
