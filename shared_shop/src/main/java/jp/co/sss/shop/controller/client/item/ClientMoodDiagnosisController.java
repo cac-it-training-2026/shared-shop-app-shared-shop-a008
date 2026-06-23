@@ -58,27 +58,27 @@ public class ClientMoodDiagnosisController {
 		List<Item> itemList = new ArrayList<>();
 
 		switch (mood) {
-			case "relax":
-				moodTitle = "ゆっくりしたい日のおすすめ";
-				itemList = getItemsByCategoryName("書籍");
-				break;
-			case "focus":
-				moodTitle = "集中したい日のおすすめ";
-				itemList = getItemsByCategoryName("書籍");
-				break;
-			case "energy":
-				moodTitle = "元気を出したい日のおすすめ";
-				itemList = getItemsByCategoryName("食料品");
-				break;
-			case "gift":
-				moodTitle = "誰かに贈りたい日のおすすめ";
-				itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
-				if (itemList.isEmpty()) {
-					itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
-				}
-				break;
-			default:
-				return "client/item/mood";
+		case "relax":
+			moodTitle = "ゆっくりしたい日のおすすめ";
+			itemList = getItemsByCategoryName("リラックス");
+			break;
+		case "focus":
+			moodTitle = "集中したい日のおすすめ";
+			itemList = getItemsByCategoryName("書籍");
+			break;
+		case "energy":
+			moodTitle = "元気を出したい日のおすすめ";
+			itemList = getItemsByCategoryName("食料品");
+			break;
+		case "gift":
+			moodTitle = "誰かに贈りたい日のおすすめ";
+			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+			if (itemList.isEmpty()) {
+				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
+			}
+			break;
+		default:
+			return "client/item/mood";
 		}
 
 		// ItemBeanに変換
