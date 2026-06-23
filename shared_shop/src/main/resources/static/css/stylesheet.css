@@ -741,6 +741,38 @@ p.link_center {
 	padding-right: 20px;
 }
 
+.quantity_control {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.quantity_control span {
+	margin: 0 10px;
+	min-width: 20px;
+	display: inline-block;
+}
+
+.quantity_button {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	margin: 0;
+	font-size: 1.2rem;
+	line-height: 1;
+	cursor: pointer;
+	border: 1px solid #808080;
+	border-radius: 4px;
+	background: #fff;
+	color: #12526d;
+}
+
+.quantity_button:disabled {
+	background: #eee;
+	color: #ccc;
+	cursor: not-allowed;
+}
+
 
 /* ---- 気分で選ぶ商品診断 ---- */
 .mood_form_area {
