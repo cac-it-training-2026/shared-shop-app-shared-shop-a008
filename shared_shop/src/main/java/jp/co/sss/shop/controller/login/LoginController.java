@@ -72,6 +72,33 @@ public class LoginController {
 		String returnStr = "login";
 		if (result.hasErrors()) {
 			// 入力値に誤りがあった場合
+
+			// ログイン失敗回数のカウントアップ処理
+			User user = userRepository.findByEmailAndDeleteFlag(form.getEmail(), Constant.NOT_DELETED);
+			if (user != null) {
+				// ロック中でない場合のみカウントアップ
+				java.sql.Timestamp lockDatetime = user.getLockDatetime();
+				boolean isLocked = false;
+				if (lockDatetime != null) {
+					long currentTime = System.currentTimeMillis();
+					long lockTime = lockDatetime.getTime();
+					long unlockTime = lockTime + (30 * 60 * 1000);
+					if (currentTime < unlockTime) {
+						isLocked = true;
+					}
+				}
+
+				if (!isLocked) {
+					int failureCount = user.getLoginFailureCount() + 1;
+					user.setLoginFailureCount(failureCount);
+					if (failureCount >= 5) {
+						// 5回失敗でロック
+						user.setLockDatetime(new java.sql.Timestamp(System.currentTimeMillis()));
+					}
+					userRepository.save(user);
+				}
+			}
+
 			// セッション情報を無効にして、ログイン画面再表示
 			session.invalidate();
 			returnStr = "login";
@@ -79,6 +106,11 @@ public class LoginController {
 		} else {
 			// 会員情報を取得
 			User user = userRepository.findByEmailAndDeleteFlag(form.getEmail(), Constant.NOT_DELETED);
+
+			// ログイン成功時に失敗回数とロック日時をリセット
+			user.setLoginFailureCount(0);
+			user.setLockDatetime(null);
+			userRepository.save(user);
 
 			// UserBeanに情報をコピー
 			UserBean userBean = new UserBean();
