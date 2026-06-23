@@ -233,11 +233,9 @@ public class ClientBasketController {
 				// 商品情報を取得
 				Item item = itemRepository.getReferenceById(id);
 
-				// 数量の補正（1未満は1、在庫数超えは在庫数）
-				int newOrderNum = orderNum;
-				if (newOrderNum < 1) {
-					newOrderNum = 1;
-				} else if (newOrderNum > item.getStock()) {
+				// 数量の補正（nullまたは1未満は1、在庫数超えは在庫数）
+				int newOrderNum = (orderNum == null || orderNum < 1) ? 1 : orderNum;
+				if (newOrderNum > item.getStock()) {
 					newOrderNum = item.getStock();
 				}
 

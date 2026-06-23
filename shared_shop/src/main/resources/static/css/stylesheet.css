@@ -756,16 +756,6 @@ p.link_center {
 	border-radius: 4px;
 }
 
-.update_button {
-	padding: 2px 8px;
-	font-size: 0.9rem;
-	cursor: pointer;
-	border: 1px solid #808080;
-	border-radius: 4px;
-	background: #edf9fe;
-	color: #12526d;
-}
-
 .quantity_button {
 	width: 30px;
 	height: 30px;
