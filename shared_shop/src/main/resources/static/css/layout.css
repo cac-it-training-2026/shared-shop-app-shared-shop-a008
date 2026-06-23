@@ -1,5 +1,13 @@
 ﻿@charset "UTF-8";
 
+:root {
+	--mint-accent: #4ebfa5;
+	--mint-light: #f0f9f7;
+	--mint-dark: #3a8f7b;
+	--text-color: #333;
+	--admin-accent: #ff8669;
+}
+
 /* ---- 共通 ---- */
 /* スキルアップテクニック1-1
  * html要素に対しmin-heightプロパティを付けることで、
