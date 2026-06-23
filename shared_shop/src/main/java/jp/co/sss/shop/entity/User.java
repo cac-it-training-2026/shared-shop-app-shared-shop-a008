@@ -88,6 +88,18 @@ public class User {
 	private Integer point = 0;
 
 	/**
+	 * ログイン失敗回数
+	 */
+	@Column
+	private Integer loginFailureCount = 0;
+
+	/**
+	 * ロック日時
+	 */
+	@Column
+	private java.sql.Timestamp lockDatetime;
+
+	/**
 	 * 登録日付
 	 */
 	@Column(insertable = false)
@@ -267,6 +279,38 @@ public class User {
 	 */
 	public void setPoint(Integer point) {
 		this.point = point;
+	}
+
+	/**
+	 * ログイン失敗回数の取得
+	 * @return ログイン失敗回数
+	 */
+	public Integer getLoginFailureCount() {
+		return loginFailureCount;
+	}
+
+	/**
+	 * ログイン失敗回数のセット
+	 * @param loginFailureCount ログイン失敗回数
+	 */
+	public void setLoginFailureCount(Integer loginFailureCount) {
+		this.loginFailureCount = loginFailureCount;
+	}
+
+	/**
+	 * ロック日時の取得
+	 * @return ロック日時
+	 */
+	public java.sql.Timestamp getLockDatetime() {
+		return lockDatetime;
+	}
+
+	/**
+	 * ロック日時のセット
+	 * @param lockDatetime ロック日時
+	 */
+	public void setLockDatetime(java.sql.Timestamp lockDatetime) {
+		this.lockDatetime = lockDatetime;
 	}
 
 	/**

@@ -44,10 +44,32 @@ public class LoginValidator implements ConstraintValidator<LoginCheck, Object> {
 
 		User user = userRepository.findByEmailAndDeleteFlag(emailProp, Constant.NOT_DELETED);
 
-		if (user != null && passwordProp.equals(user.getPassword())) {
-			isValidFlg = true;
+		if (user != null) {
+			// アカウントロック状態の確認
+			java.sql.Timestamp lockDatetime = user.getLockDatetime();
+			if (lockDatetime != null) {
+				// 現在時刻とロック日時を比較（30分間ロック）
+				long currentTime = System.currentTimeMillis();
+				long lockTime = lockDatetime.getTime();
+				long unlockTime = lockTime + (30 * 60 * 1000); // 30分後
+
+				if (currentTime < unlockTime) {
+					// ロック中の場合
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate("{msg.login.account.locked}")
+							.addConstraintViolation();
+					return false;
+				}
+			}
+
+			if (passwordProp.equals(user.getPassword())) {
+				isValidFlg = true;
+			} else {
+				// パスワード不一致
+				isValidFlg = false;
+			}
 		} else {
-			//ユーザ認証に失敗
+			// ユーザが存在しない
 			isValidFlg = false;
 		}
 		return isValidFlg;
