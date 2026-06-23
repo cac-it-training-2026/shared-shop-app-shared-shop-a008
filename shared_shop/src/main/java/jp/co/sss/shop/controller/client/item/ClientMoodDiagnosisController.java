@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,21 +61,24 @@ public class ClientMoodDiagnosisController {
 		switch (mood) {
 		case "relax":
 			moodTitle = "ゆっくりしたい日のおすすめ";
-			itemList = getItemsByCategoryName("リラックス");
+			itemList = getRecommendedItemByCategoryName("リラックス");
 			break;
 		case "focus":
 			moodTitle = "集中したい日のおすすめ";
-			itemList = getItemsByCategoryName("書籍");
+			itemList = getRecommendedItemByCategoryName("書籍");
 			break;
 		case "energy":
 			moodTitle = "元気を出したい日のおすすめ";
-			itemList = getItemsByCategoryName("食料品");
+			itemList = getRecommendedItemByCategoryName("食料品");
 			break;
 		case "gift":
 			moodTitle = "誰かに贈りたい日のおすすめ";
-			itemList = itemRepository.findAllByHotSellItems(Constant.NOT_DELETED);
+			itemList = itemRepository.findAllHotSellItems(Constant.NOT_DELETED, PageRequest.of(0, 1));
 			if (itemList.isEmpty()) {
 				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
+				if (!itemList.isEmpty()) {
+					itemList = itemList.subList(0, 1);
+				}
 			}
 			break;
 		default:
@@ -91,16 +95,35 @@ public class ClientMoodDiagnosisController {
 	}
 
 	/**
-	 * カテゴリ名で商品リストを取得
+	 * カテゴリ名でおすすめ商品（注文数1位）を取得
 	 *
 	 * @param categoryName カテゴリ名
-	 * @return 商品エンティティのリスト
+	 * @return 商品エンティティのリスト（1件または空）
 	 */
-	private List<Item> getItemsByCategoryName(String categoryName) {
+	private List<Item> getRecommendedItemByCategoryName(String categoryName) {
 		Category category = categoryRepository.findByNameAndDeleteFlag(categoryName, Constant.NOT_DELETED);
+		List<Item> itemList;
 		if (category != null) {
-			return itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(category.getId(), Constant.NOT_DELETED);
+			itemList = itemRepository.findHotSellItemsByCategoryId(category.getId(), Constant.NOT_DELETED,
+					PageRequest.of(0, 1));
+			if (itemList.isEmpty()) {
+				// カテゴリ内に注文履歴がない場合、カテゴリ内の商品を1件取得
+				itemList = itemRepository.findByCategoryIdAndDeleteFlagOrderByIdDesc(category.getId(),
+						Constant.NOT_DELETED);
+				if (!itemList.isEmpty()) {
+					itemList = itemList.subList(0, 1);
+				}
+			}
+		} else {
+			// カテゴリ自体が存在しない場合、全商品から1件取得
+			itemList = itemRepository.findAllHotSellItems(Constant.NOT_DELETED, PageRequest.of(0, 1));
+			if (itemList.isEmpty()) {
+				itemList = itemRepository.findByDeleteFlagOrderByIdDesc(Constant.NOT_DELETED);
+				if (!itemList.isEmpty()) {
+					itemList = itemList.subList(0, 1);
+				}
+			}
 		}
-		return new ArrayList<>();
+		return itemList;
 	}
 }
