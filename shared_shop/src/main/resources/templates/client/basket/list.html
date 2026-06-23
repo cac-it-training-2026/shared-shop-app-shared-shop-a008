@@ -48,7 +48,13 @@
 							<input type="hidden" name="id" th:value="${item.id}" />
 							<input type="submit" value="－" class="quantity_button" th:disabled="${item.orderNum <= 1}" />
 						</form>
-						<span th:text="${item.orderNum}"></span>
+
+						<form th:action="@{/client/basket/update}" method="post" style="display: inline;">
+							<input type="hidden" name="id" th:value="${item.id}" />
+							<input type="number" name="orderNum" th:value="${item.orderNum}" min="1" th:max="${item.stock}" class="quantity_input" />
+							<input type="submit" value="変更" class="update_button" />
+						</form>
+
 						<form th:action="@{/client/basket/increment}" method="post" style="display: inline;">
 							<input type="hidden" name="id" th:value="${item.id}" />
 							<input type="submit" value="＋" class="quantity_button" th:disabled="${item.orderNum >= item.stock}" />

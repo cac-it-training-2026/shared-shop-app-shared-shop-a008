@@ -215,6 +215,48 @@ public class ClientBasketController {
 	}
 
 	/**
+	 * 買い物かごの商品の数量を直接更新するメソッド
+	 *
+	 * @param id 更新する商品のID
+	 * @param orderNum 新しい注文数
+	 * @redirect "client/basket/list" 買い物かご表示にリダイレクト
+	 */
+	@RequestMapping(path = "/client/basket/update", method = RequestMethod.POST)
+	public String basketUpdate(Integer id, Integer orderNum) {
+		// 買い物かごリストを取得
+		List<BasketBean> basket = (List<BasketBean>) session.getAttribute("basketBeans");
+
+		// 拡張for文で買い物かごリストの中身をチェック
+		for (BasketBean basketBean : basket) {
+			// 更新対象の商品IDと一致する場合
+			if (basketBean.getId().equals(id)) {
+				// 商品情報を取得
+				Item item = itemRepository.getReferenceById(id);
+
+				// 数量の補正（1未満は1、在庫数超えは在庫数）
+				int newOrderNum = orderNum;
+				if (newOrderNum < 1) {
+					newOrderNum = 1;
+				} else if (newOrderNum > item.getStock()) {
+					newOrderNum = item.getStock();
+				}
+
+				// 注文数を更新
+				basketBean.setOrderNum(newOrderNum);
+				break;
+			}
+		}
+
+		// 買い物かごをセッションに保存
+		session.setAttribute("basketBeans", basket);
+
+		updateBasketSummary(session);
+
+		// 買い物かごリストにリダイレクト
+		return "redirect:/client/basket/list";
+	}
+
+	/**
 	 * 買い物かごの商品を削除するメソッド
 	 * 
 	 * @param session セッション情報
