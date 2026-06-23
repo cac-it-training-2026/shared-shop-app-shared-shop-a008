@@ -340,11 +340,21 @@ li.error_msg  {
 
 .user_info_form_area .send_button,
 .info_form_area .send_button {
-	background: #edf9fe;
+	background: var(--mint-dark);
+	color: #fff;
+}
+.user_info_form_area .send_button:hover,
+.info_form_area .send_button:hover {
+	background: var(--mint-accent);
 }
 .user_info_form_area .back_button,
 .info_form_area .back_button {
-	background: #ddd;
+	background: #999;
+	color: #fff;
+}
+.user_info_form_area .back_button:hover,
+.info_form_area .back_button:hover {
+	background: #777;
 }
 
 .shopping_button{
@@ -439,13 +449,19 @@ li.error_msg  {
 }
 
 /* ---- 入力欄全般 ---- */
-[type=text], [type=password], [type=date], select, textarea {
+[type=text], [type=password], [type=date], [type=number], select, textarea {
 	padding: 8px 12px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	box-sizing: border-box;
 	font-size: 1em;
 	color: var(--text-color);
+}
+
+.detail_button_area input[type=number] {
+	padding: 10px;
+	font-size: 1.2em;
+	width: 100px;
 }
 
 [type=text]:focus, [type=password]:focus, [type=date]:focus, select:focus, textarea:focus {
@@ -673,10 +689,10 @@ select {
 	margin: 0 3px;
 }
 .list_table.basket .delete{
-	width: 80px;
-	height: 35px;
-	padding: 0px 10px;
-	border-radius: 6px;
+	width: auto;
+	height: auto;
+	padding: 8px 15px;
+	border-radius: 4px;
 	font-weight: bold;
 }
 
@@ -785,12 +801,13 @@ p.link_center {
 }
 
 .quantity_input {
-	width: 50px;
+	width: 80px;
 	text-align: center;
 	margin: 0 5px;
-	padding: 2px;
-	border: 1px solid #808080;
+	padding: 8px;
+	border: 1px solid #ccc;
 	border-radius: 4px;
+	font-size: 1.1em;
 }
 
 .quantity_button {
