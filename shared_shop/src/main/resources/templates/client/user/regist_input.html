@@ -51,7 +51,7 @@
 			</ul>
 			<input type="hidden" name="authority" value="2" />
 			<div class="shopping_button">
-				<button type="button" class="back_button" onclick="location.href='/shared_shop/'">戻る</button>
+				<button type="button" class="back_button" th:onclick="|location.href='@{/}'|">戻る</button>
 				<input type="submit" value="確認" class="send_button" />
 			</div>
 		</form>

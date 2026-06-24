@@ -40,10 +40,10 @@
 		</ul>
 
 		<form th:action="@{/client/user/update/complete}" method="post">
-			<input type="submit" value="登録" class="send_button" />
-		</form>
-		<form th:action="@{/client/user/update/input}" method="post">
-			<input type="submit" value="戻る" class="back_button" />
+			<div class="shopping_button">
+				<button type="button" class="back_button" onclick="window.history.back();">戻る</button>
+				<input type="submit" value="登録" class="send_button" />
+			</div>
 		</form>
 	</div>
 </body>
