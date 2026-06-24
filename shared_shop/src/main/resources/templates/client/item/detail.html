@@ -33,6 +33,9 @@
 			</dl>
 		</div>
 		<div class="detail_button_area">
+			<form th:action="@{/client/item/list/1}" method="post">
+				<input type="submit" value="戻る" class="back_button" />
+			</form>
 			<form th:action="@{/client/basket/add}" method="post" class="user_info_form" th:if="*{stock > 0}" th:object="${basketForm}">
 				<th:block th:if="${#fields.hasErrors()}">
 					<ul class="error_list">
@@ -51,9 +54,6 @@
 					<input type="number" th:field="*{quantity}" min="1" th:max="${item.stock}" />
 				</label>
 				<input type="submit" value="買い物かごに入れる" class="send_button" />
-			</form>
-			<form th:action="@{/client/item/list/1}" method="post">
-				<input type="submit" value="戻る" class="back_button" />
 			</form>
 		</div>
 	</div>

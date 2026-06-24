@@ -5,7 +5,7 @@
 </head>
 <body>
 <div th:fragment="layout-header" class="container">
-	<h1 th:class="site_title" th:text="#{shop.title}"></h1>
+	<a th:href="@{/}" class="site_title" th:text="#{shop.title}"></a>
 	<div th:if="${session.user != null and session.user.authority == 2}" class="user_info">
 		<a th:href="@{/client/basket/list}" class="basket_summary">
 			カート：<span th:text="${session.basketTotalCount ?: 0}">0</span>点 /

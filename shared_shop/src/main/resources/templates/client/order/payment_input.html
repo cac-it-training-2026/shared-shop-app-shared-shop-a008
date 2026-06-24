@@ -57,11 +57,10 @@
 				</li>
 			</ul>
 
-			<input type="submit" class="send_button" value="次へ" />
-
-		</form>
-		<form th:action="@{/client/order/payment/back}" method="post" class="update">
-			<input type="submit" class="back_button" value="戻る" />
+			<div class="shopping_button">
+				<button type="button" class="back_button" onclick="window.history.back();">戻る</button>
+				<input type="submit" class="send_button" value="次へ" />
+			</div>
 		</form>
 	</div>
 </body>
