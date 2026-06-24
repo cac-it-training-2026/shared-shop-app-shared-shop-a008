@@ -269,16 +269,10 @@ public class ClientBasketController {
 		// 拡張for文で買い物かごリストの中身をチェック
 		for (BasketBean basketBean : basket) {
 			// 削除対象の商品IDと一致する場合
-			if (basketBean.getId() == id) {
-				// 注文数が1の場合
-				if (basketBean.getOrderNum() == 1) {
-					basket.remove(basketBean);
-					break;
-				} else { // 注文数が2個以上ある場合
-					// 要素の注文数を現在の注文数-1する
-					basketBean.setOrderNum(basketBean.getOrderNum() - 1);
-					break;
-				}
+			if (basketBean.getId().equals(id)) {
+				basket.remove(basketBean);
+				break;
+
 			}
 		}
 
@@ -394,7 +388,8 @@ public class ClientBasketController {
 
 		if (basket != null && !basket.isEmpty()) {
 			for (BasketBean bean : basket) {
-				Item item = itemRepository.findByIdAndDeleteFlag(bean.getId(), jp.co.sss.shop.util.Constant.NOT_DELETED);
+				Item item = itemRepository.findByIdAndDeleteFlag(bean.getId(),
+						jp.co.sss.shop.util.Constant.NOT_DELETED);
 				if (item != null) {
 					totalCount += bean.getOrderNum();
 					totalPrice += item.getPrice() * bean.getOrderNum();
